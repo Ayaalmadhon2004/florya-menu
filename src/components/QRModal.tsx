@@ -16,14 +16,18 @@ export default function QRModal({ url, onClose }: QRModalProps) {
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Share menu QR code"
+      aria-labelledby="qr-title"
     >
       <div
         className="bg-white rounded-2xl p-6 max-w-xs w-full text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold text-text-primary mb-1">Share Menu</h3>
-        <p className="text-xs text-text-secondary mb-4">Scan to open on your phone</p>
+        <h3 id="qr-title" className="text-lg font-semibold text-text-primary mb-1">
+          Share Menu
+        </h3>
+        <p className="text-xs text-text-secondary mb-4">
+          Scan to open on your phone
+        </p>
         <Image
           src={qrSrc}
           alt="QR Code for menu sharing"
@@ -36,7 +40,7 @@ export default function QRModal({ url, onClose }: QRModalProps) {
         <button
           onClick={onClose}
           aria-label="Close QR modal"
-          className="w-full py-2.5 rounded-lg bg-burgundy text-white text-sm font-medium hover:bg-burgundy-dark transition"
+          className="w-full py-2.5 rounded-lg bg-burgundy text-white text-sm font-medium hover:bg-burgundy-dark transition min-h-[48px]"
         >
           Close
         </button>
