@@ -16,6 +16,7 @@ export default function Header({ title, subtitle, pageNum, onBack, showBack = tr
           {showBack ? (
             <button
               onClick={onBack}
+              aria-label="Go back"
               className="w-9 h-9 rounded-lg border border-white/20 bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition"
             >
               ←

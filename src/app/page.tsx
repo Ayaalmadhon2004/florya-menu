@@ -3,14 +3,15 @@
 import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { menuPages, Dish } from "@/data/menu";
-import Header from "@/components/Header";
-import DishCard from "@/components/DishCard";
-import BottomNav from "@/components/BottomNav";
-import CartBar from "@/components/CartBar";
-import QRModal from "@/components/QRModal";
+import Image from "next/image";
+import { menuPages, Dish } from "../data/menu";
+import Header from "../components/Header";
+import DishCard from "../components/DishCard";
+import BottomNav from "../components/BottomNav";
+import CartBar from "../components/CartBar";
+import QRModal from "../components/QRModal";
 
-// WhatsApp number - CHANGE THIS to the restaurant's number
+// WhatsApp number - CHANGE THIS to the restaurant's number (Saudi number, no + or spaces)
 const WHATSAPP_NUMBER = "966501234567";
 
 export default function Home() {
@@ -21,10 +22,10 @@ export default function Home() {
   const [cart, setCart] = useState<Dish[]>([]);
   const [showQR, setShowQR] = useState(false);
   const [direction, setDirection] = useState(1);
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
   const totalPages = menuPages.length;
@@ -77,12 +78,12 @@ export default function Home() {
   const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   // Swipe handling
-  const [touchStart, setTouchStart] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.touches[0].clientX);
+    setTouchStartX(e.touches[0].clientX);
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = touchStart - e.changedTouches[0].clientX;
+    const diff = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
       if (diff > 0) nextPage();
       else prevPage();
@@ -107,10 +108,10 @@ export default function Home() {
     }),
   };
 
-  if (!isClient) {
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-beige flex items-center justify-center">
-        <div className="text-burgundy text-xl font-semibold">Loading...</div>
+        <div className="text-burgundy text-xl font-semibold">Florya</div>
       </div>
     );
   }
@@ -127,8 +128,8 @@ export default function Home() {
       {/* QR Button */}
       <button
         onClick={() => setShowQR(true)}
+        aria-label="Share menu QR code"
         className="absolute top-3 right-3 z-40 w-9 h-9 rounded-full bg-white/90 border border-beige-dark flex items-center justify-center text-sm shadow-sm hover:bg-white transition"
-        title="Share Menu"
       >
         🔗
       </button>
@@ -171,6 +172,7 @@ export default function Home() {
                   </p>
                   <button
                     onClick={() => goToPage(1)}
+                    aria-label="Explore menu"
                     className="px-8 py-3 rounded-xl bg-burgundy text-white font-medium hover:bg-burgundy-dark transition"
                   >
                     Explore Menu →
@@ -194,6 +196,7 @@ export default function Home() {
                       <button
                         key={item.name}
                         onClick={() => goToPage(item.page)}
+                        aria-label={`Go to ${item.name}`}
                         className="w-full flex items-center justify-between py-4 border-b border-beige-dark hover:bg-white/50 transition px-2 rounded-lg"
                       >
                         <span className="text-[15px] font-medium text-text-primary">{item.name}</span>
@@ -268,13 +271,16 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* QR Code */}
+                      {/* QR Code using next/image */}
                       <div className="mt-8 pt-6 border-t border-beige-dark text-center">
                         <p className="text-xs text-text-muted mb-3">Scan to share this menu</p>
-                        <img
+                        <Image
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pageUrl)}`}
-                          alt="Menu QR"
-                          className="w-36 h-36 mx-auto"
+                          alt="Menu QR code for sharing"
+                          width={144}
+                          height={144}
+                          className="mx-auto"
+                          unoptimized
                         />
                       </div>
                     </>

@@ -216,9 +216,9 @@ export const menuPages: MenuPage[] = [
     title: "Contact",
     contact: {
       address: "King Fahd Road, Riyadh, Saudi Arabia",
-      phone: "+966 11 234 5678",
+      phone: "+966 50 123 4567",
       hours: "Daily 12 PM - 12 AM",
-      instagram: "@florya_rest",
+      instagram: "..florya_rest",
     },
   },
 ];

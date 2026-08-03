@@ -1,6 +1,6 @@
 "use client";
 
-import { Dish } from "@/data/menu";
+import { Dish } from "../data/menu";
 
 interface CartBarProps {
   items: Dish[];
@@ -22,6 +22,7 @@ export default function CartBar({ items, onCheckout }: CartBarProps) {
       </div>
       <button
         onClick={onCheckout}
+        aria-label="Send order via WhatsApp"
         className="bg-white text-burgundy px-4 py-2 rounded-lg text-sm font-semibold hover:bg-beige transition"
       >
         Order via WhatsApp
