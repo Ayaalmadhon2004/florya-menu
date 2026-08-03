@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { menuPages, Dish } from "@/data/menu";
 import Header from "@/components/Header";
@@ -9,9 +10,13 @@ import BottomNav from "@/components/BottomNav";
 import CartBar from "@/components/CartBar";
 import QRModal from "@/components/QRModal";
 
-const WHATSAPP_NUMBER = "970598509088";
+// WhatsApp number - CHANGE THIS to the restaurant's number
+const WHATSAPP_NUMBER = "966501234567";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const tableNumber = searchParams.get("table") || "Unknown";
+
   const [currentPage, setCurrentPage] = useState(0);
   const [cart, setCart] = useState<Dish[]>([]);
   const [showQR, setShowQR] = useState(false);
@@ -54,8 +59,9 @@ export default function Home() {
 
     const lines = cart.map((d) => `• ${d.name} - ${d.price} SAR`);
     const total = cart.reduce((sum, d) => sum + d.price, 0);
+
     const message = [
-      "Hello! I would like to order:",
+      `Hello! Order from Table ${tableNumber}:`,
       "",
       ...lines,
       "",
@@ -111,6 +117,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-beige flex flex-col max-w-md mx-auto shadow-2xl overflow-hidden">
+      {/* Table Number Badge */}
+      {tableNumber !== "Unknown" && (
+        <div className="absolute top-3 left-3 z-40 px-3 py-1 rounded-full bg-burgundy text-white text-xs font-semibold shadow-md">
+          Table {tableNumber}
+        </div>
+      )}
+
       {/* QR Button */}
       <button
         onClick={() => setShowQR(true)}
@@ -144,10 +157,13 @@ export default function Home() {
               <div className="min-h-full flex flex-col">
                 <div className="bg-burgundy text-white flex flex-col items-center justify-center py-16 px-6">
                   <div className="w-24 h-24 rounded-full border-2 border-white/30 flex items-center justify-center mb-6">
-                    <span className="text-4xl font-bold">M</span>
+                    <span className="text-4xl font-bold">F</span>
                   </div>
                   <h1 className="text-3xl font-bold tracking-wider">Florya</h1>
                   <p className="text-sm text-white/60 mt-2 tracking-widest uppercase">Restaurant</p>
+                  {tableNumber !== "Unknown" && (
+                    <p className="text-xs text-white/40 mt-4 tracking-wider">Table {tableNumber}</p>
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center px-8 py-12">
                   <p className="text-text-secondary text-center leading-relaxed mb-8">
