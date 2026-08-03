@@ -8,13 +8,7 @@ interface BottomNavProps {
   onDotClick: (page: number) => void;
 }
 
-export default function BottomNav({
-  currentPage,
-  totalPages,
-  onPrev,
-  onNext,
-  onDotClick,
-}: BottomNavProps) {
+export default function BottomNav({ currentPage, totalPages, onPrev, onNext, onDotClick }: BottomNavProps) {
   return (
     <nav
       className="bg-white border-t border-beige-dark px-6 py-3 flex items-center justify-between"
@@ -29,11 +23,7 @@ export default function BottomNav({
         ← Prev
       </button>
 
-      <div
-        className="flex gap-2 items-center"
-        role="tablist"
-        aria-label="Menu pages"
-      >
+      <div className="flex gap-2 items-center" role="tablist" aria-label="Menu pages">
         {Array.from({ length: totalPages }).map((_, i) => (
           <button
             key={i}
@@ -42,9 +32,7 @@ export default function BottomNav({
             aria-selected={i === currentPage}
             aria-label={`Page ${i + 1}`}
             className={`h-2 rounded-full transition-all duration-200 ${
-              i === currentPage
-                ? "w-5 bg-burgundy"
-                : "w-2 bg-beige-dark hover:bg-text-muted"
+              i === currentPage ? "w-5 bg-burgundy" : "w-2 bg-beige-dark hover:bg-text-muted"
             }`}
           />
         ))}

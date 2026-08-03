@@ -34,7 +34,7 @@ export default function DishCard({ dish, onAdd, added }: DishCardProps) {
           <button
             onClick={() => onAdd(dish)}
             aria-label={`Add ${dish.name} to order`}
-            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-lg font-light transition-all duration-150 ${
+            className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-lg font-light transition-all duration-150 ${
               added
                 ? "bg-accent-new border-accent-new text-white"
                 : "border-beige-dark text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy"
