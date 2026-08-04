@@ -3,7 +3,6 @@
 import { useState, useCallback, memo } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { menuPages, Dish } from "../data/menu";
 import Header from "../components/Header";
@@ -72,7 +71,6 @@ export default function MenuContent() {
 
   const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
-  // Swipe handling
   const [touchStartX, setTouchStartX] = useState(0);
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
@@ -88,7 +86,6 @@ export default function MenuContent() {
     [touchStartX, nextPage, prevPage]
   );
 
-  // Animation أخف = أقل CPU (بدون rotateY)
   const variants = {
     enter: (dir: number) => ({ x: dir > 0 ? 200 : -200, opacity: 0 }),
     center: { x: 0, opacity: 1 },
@@ -202,7 +199,13 @@ export default function MenuContent() {
                       <div className="flex items-start gap-3"><span className="text-xl">📱</span><div><p className="text-xs text-text-muted uppercase tracking-wider mb-1">Instagram</p><p className="text-sm text-text-primary">{page.contact.instagram}</p></div></div>
                       <div className="mt-8 pt-6 border-t border-beige-dark text-center">
                         <p className="text-xs text-text-muted mb-3">Scan to share this menu</p>
-                        <Image src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pageUrl)}`} alt="Menu QR code for sharing" width={144} height={144} className="mx-auto" unoptimized />
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(pageUrl)}`}
+                          alt="Menu QR code for sharing"
+                          width={144}
+                          height={144}
+                          className="mx-auto"
+                        />
                       </div>
                     </>
                   )}

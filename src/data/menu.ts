@@ -3,7 +3,7 @@ export interface Dish {
   name: string;
   description: string;
   price: number;
-  emoji: string;
+  image: string;
   badges: ("hot" | "new" | "veg")[];
 }
 
@@ -53,7 +53,7 @@ export const menuPages: MenuPage[] = [
         name: "Florya Special Salad",
         description: "Fresh greens, feta cheese, olives, balsamic dressing",
         price: 45,
-        emoji: "🥗",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop&q=80",
         badges: ["veg"],
       },
       {
@@ -61,7 +61,7 @@ export const menuPages: MenuPage[] = [
         name: "Crispy Fried Shrimp",
         description: "Fresh shrimp coated in breadcrumbs, cocktail sauce",
         price: 68,
-        emoji: "🍤",
+        image: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=200&h=200&fit=crop&q=80",
         badges: ["hot"],
       },
       {
@@ -69,7 +69,7 @@ export const menuPages: MenuPage[] = [
         name: "Beirut Hummus",
         description: "Authentic hummus with tahini, lemon, olive oil",
         price: 32,
-        emoji: "🥙",
+        image: "https://images.unsplash.com/photo-1637949385162-e416fb15b2ce?w=200&h=200&fit=crop&q=80",
         badges: ["veg"],
       },
       {
@@ -77,7 +77,7 @@ export const menuPages: MenuPage[] = [
         name: "Truffle Burrata",
         description: "Creamy burrata, truffle oil, roasted tomatoes",
         price: 58,
-        emoji: "🧀",
+        image: "https://images.unsplash.com/photo-1529312266912-b33cf6227e24?w=200&h=200&fit=crop&q=80",
         badges: ["new"],
       },
     ],
@@ -93,7 +93,7 @@ export const menuPages: MenuPage[] = [
         name: "Angus Grilled Steak",
         description: "300g Angus cut, charcoal grilled, black pepper sauce",
         price: 129,
-        emoji: "🥩",
+        image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=200&h=200&fit=crop&q=80",
         badges: ["hot"],
       },
       {
@@ -101,7 +101,7 @@ export const menuPages: MenuPage[] = [
         name: "Oven Lamb Ribs",
         description: "Tender lamb ribs with special spices, roasted potatoes",
         price: 145,
-        emoji: "🍖",
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=200&fit=crop&q=80",
         badges: ["new"],
       },
       {
@@ -109,7 +109,7 @@ export const menuPages: MenuPage[] = [
         name: "Florya Double Burger",
         description: "Double fresh beef, cheddar, lettuce, tomato, special sauce",
         price: 75,
-        emoji: "🍔",
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
     ],
@@ -125,7 +125,7 @@ export const menuPages: MenuPage[] = [
         name: "Herb Grilled Chicken",
         description: "Whole chicken roasted with thyme & lemon, basmati rice",
         price: 98,
-        emoji: "🍗",
+        image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop&q=80",
         badges: ["hot"],
       },
       {
@@ -133,7 +133,7 @@ export const menuPages: MenuPage[] = [
         name: "Grilled Fish Fillet",
         description: "Fresh fish fillet, lemon butter sauce, sautéed vegetables",
         price: 110,
-        emoji: "🐟",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
       {
@@ -141,7 +141,7 @@ export const menuPages: MenuPage[] = [
         name: "Chicken Alfredo Pasta",
         description: "Fettuccine pasta, cream sauce, mushrooms, parmesan",
         price: 72,
-        emoji: "🍝",
+        image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200&h=200&fit=crop&q=80",
         badges: ["new"],
       },
     ],
@@ -157,7 +157,7 @@ export const menuPages: MenuPage[] = [
         name: "Italian Tiramisu",
         description: "Coffee-soaked biscuits, mascarpone, cocoa",
         price: 42,
-        emoji: "🍰",
+        image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=200&h=200&fit=crop&q=80",
         badges: ["hot"],
       },
       {
@@ -165,7 +165,7 @@ export const menuPages: MenuPage[] = [
         name: "Belgian Waffle",
         description: "Crispy waffle, vanilla ice cream, chocolate, strawberry",
         price: 38,
-        emoji: "🧇",
+        image: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
       {
@@ -173,7 +173,7 @@ export const menuPages: MenuPage[] = [
         name: "Caramel Custard",
         description: "Smooth vanilla custard, crispy caramel layer",
         price: 35,
-        emoji: "🍮",
+        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
     ],
@@ -189,7 +189,7 @@ export const menuPages: MenuPage[] = [
         name: "Florya Arabic Coffee",
         description: "Authentic Arabic coffee with cardamom & saffron",
         price: 18,
-        emoji: "☕",
+        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
       {
@@ -197,7 +197,7 @@ export const menuPages: MenuPage[] = [
         name: "Florya Special Mocktail",
         description: "Mango, strawberry, mint, lemon, soda",
         price: 28,
-        emoji: "🍹",
+        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200&h=200&fit=crop&q=80",
         badges: ["new"],
       },
       {
@@ -205,7 +205,7 @@ export const menuPages: MenuPage[] = [
         name: "Fresh Mixed Juice",
         description: "Orange, carrot, lemon, fresh ginger",
         price: 24,
-        emoji: "🧃",
+        image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=200&h=200&fit=crop&q=80",
         badges: [],
       },
     ],
@@ -218,7 +218,7 @@ export const menuPages: MenuPage[] = [
       address: "King Fahd Road, Riyadh, Saudi Arabia",
       phone: "+966 50 123 4567",
       hours: "Daily 12 PM - 12 AM",
-      instagram: "..florya_rest",
+      instagram: "@florya_rest",
     },
   },
 ];
