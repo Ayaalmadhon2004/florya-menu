@@ -1,17 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
   },
-  // ✅ إضافات للبرفورمنس
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
-  experimental: {
-    optimizePackageImports: ['framer-motion'],
-  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
