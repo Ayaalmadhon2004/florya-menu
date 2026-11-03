@@ -28,7 +28,7 @@ export const ui = {
   share: { ar: "مشاركة القائمة", en: "Share menu" },
   scanToOpen: { ar: "امسح الرمز لفتح القائمة على جوالك", en: "Scan to open the menu on your phone" },
   copyLink: { ar: "نسخ الرابط", en: "Copy link" },
-  copied: { ar: "تم النسخ ✓", en: "Copied ✓" },
+  copied: { ar: "تم النسخ", en: "Copied" },
   contact: { ar: "تواصل معنا", en: "Contact us" },
   call: { ar: "اتصل", en: "Call" },
   directions: { ar: "الموقع", en: "Directions" },

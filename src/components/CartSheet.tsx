@@ -66,7 +66,7 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
           <h2 className="text-lg font-bold text-burgundy">{t("yourOrder")}</h2>
           <div className="flex items-center gap-3">
             <button onClick={() => { onClear(); onClose(); }} className="min-h-11 text-sm text-text-muted underline">{t("clear")}</button>
-            <button onClick={onClose} aria-label={t("close")} className="grid h-11 w-11 place-items-center rounded-full bg-white text-lg">✕</button>
+            <button onClick={onClose} aria-label={t("close")} className="grid h-11 w-11 place-items-center rounded-full bg-white"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6L6 18" /></svg></button>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 /**
- * ⚙️ إعدادات المطعم — هذا هو الملف الوحيد الذي تعدّله لكل عميل جديد.
+ * إعدادات المطعم — هذا هو الملف الوحيد الذي تعدّله لكل عميل جديد.
  * Restaurant settings — the ONLY file you edit per client (plus src/data/menu.ts).
  */
 import type { Lang } from "../lib/i18n";
