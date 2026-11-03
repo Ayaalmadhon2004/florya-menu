@@ -1,236 +1,193 @@
+import type { L10n } from "../lib/i18n";
+
+/**
+ * 🍽️ بيانات القائمة — عدّل الأصناف والأسعار هنا فقط.
+ * badges: "hot" (الأكثر طلبًا) | "new" (جديد) | "veg" (نباتي) | "spicy" (حار)
+ * soldOut: true لإخفاء زر الإضافة مؤقتًا.
+ */
+export type Badge = "hot" | "new" | "veg" | "spicy";
+
 export interface Dish {
   id: string;
-  name: string;
-  description: string;
+  name: L10n;
+  description: L10n;
   price: number;
   image: string;
-  badges: ("hot" | "new" | "veg")[];
+  badges: Badge[];
+  soldOut?: boolean;
 }
 
-export interface MenuPage {
-  id: number;
-  type: "cover" | "index" | "category" | "contact";
-  title: string;
-  subtitle?: string;
-  dishes?: Dish[];
-  items?: { name: string; page: number }[];
-  contact?: {
-    address: string;
-    phone: string;
-    hours: string;
-    instagram: string;
-  };
+export interface Category {
+  id: string;
+  title: L10n;
+  subtitle: L10n;
+  dishes: Dish[];
 }
 
-export const menuPages: MenuPage[] = [
+export const categories: Category[] = [
   {
-    id: 0,
-    type: "cover",
-    title: "Florya",
-    subtitle: "Restaurant",
-  },
-  {
-    id: 1,
-    type: "index",
-    title: "Menu",
-    subtitle: "Welcome to an unforgettable dining experience",
-    items: [
-      { name: "Starters & Salads", page: 2 },
-      { name: "Meat & Grills", page: 3 },
-      { name: "Chicken & Seafood", page: 4 },
-      { name: "Desserts", page: 5 },
-      { name: "Beverages", page: 6 },
-    ],
-  },
-  {
-    id: 2,
-    type: "category",
-    title: "Starters & Salads",
-    subtitle: "Begin your journey",
+    id: "starters",
+    title: { ar: "المقبلات والسلطات", en: "Starters & Salads" },
+    subtitle: { ar: "ابدأ رحلتك", en: "Begin your journey" },
     dishes: [
       {
         id: "s1",
-        name: "Florya Special Salad",
-        description: "Fresh greens, feta cheese, olives, balsamic dressing",
+        name: { ar: "سلطة فلوريا الخاصة", en: "Florya Special Salad" },
+        description: { ar: "خس طازج، جبنة فيتا، زيتون، صلصة بلسميك", en: "Fresh greens, feta cheese, olives, balsamic dressing" },
         price: 45,
-        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop&q=80",
         badges: ["veg"],
       },
       {
         id: "s2",
-        name: "Crispy Fried Shrimp",
-        description: "Fresh shrimp coated in breadcrumbs, cocktail sauce",
+        name: { ar: "روبيان مقرمش", en: "Crispy Fried Shrimp" },
+        description: { ar: "روبيان مغطى بالبقسماط مع صلصة كوكتيل", en: "Fresh shrimp coated in breadcrumbs, cocktail sauce" },
         price: 68,
-        image: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400&h=400&fit=crop&q=80",
         badges: ["hot"],
       },
       {
         id: "s3",
-        name: "Beirut Hummus",
-        description: "Authentic hummus with tahini, lemon, olive oil",
+        name: { ar: "حمص بيروتي", en: "Beirut Hummus" },
+        description: { ar: "حمص أصيل بالطحينة والليمون وزيت الزيتون", en: "Authentic hummus with tahini, lemon, olive oil" },
         price: 32,
-        image: "https://images.unsplash.com/photo-1637949385162-e416fb15b2ce?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1637949385162-e416fb15b2ce?w=400&h=400&fit=crop&q=80",
         badges: ["veg"],
       },
       {
         id: "s4",
-        name: "Truffle Burrata",
-        description: "Creamy burrata, truffle oil, roasted tomatoes",
+        name: { ar: "بوراتا بالترفل", en: "Truffle Burrata" },
+        description: { ar: "جبنة بوراتا كريمية، زيت الترفل، طماطم محمصة", en: "Creamy burrata, truffle oil, roasted tomatoes" },
         price: 58,
-        image: "https://images.unsplash.com/photo-1529312266912-b33cf6227e24?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1529312266912-b33cf6227e24?w=400&h=400&fit=crop&q=80",
         badges: ["new"],
       },
     ],
   },
   {
-    id: 3,
-    type: "category",
-    title: "Meat & Grills",
-    subtitle: "From the fire",
+    id: "grills",
+    title: { ar: "اللحوم والمشاوي", en: "Meat & Grills" },
+    subtitle: { ar: "من قلب النار", en: "From the fire" },
     dishes: [
       {
         id: "m1",
-        name: "Angus Grilled Steak",
-        description: "300g Angus cut, charcoal grilled, black pepper sauce",
+        name: { ar: "ستيك أنغوس مشوي", en: "Angus Grilled Steak" },
+        description: { ar: "300 غ قطعة أنغوس مشوية على الفحم مع صلصة الفلفل الأسود", en: "300g Angus cut, charcoal grilled, black pepper sauce" },
         price: 129,
-        image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=400&fit=crop&q=80",
         badges: ["hot"],
       },
       {
         id: "m2",
-        name: "Oven Lamb Ribs",
-        description: "Tender lamb ribs with special spices, roasted potatoes",
+        name: { ar: "ريش لحم الضأن بالفرن", en: "Oven Lamb Ribs" },
+        description: { ar: "ريش ضأن طرية بتوابل خاصة مع بطاطس محمصة", en: "Tender lamb ribs with special spices, roasted potatoes" },
         price: 145,
-        image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=400&fit=crop&q=80",
         badges: ["new"],
       },
       {
         id: "m3",
-        name: "Florya Double Burger",
-        description: "Double fresh beef, cheddar, lettuce, tomato, special sauce",
+        name: { ar: "برجر فلوريا المزدوج", en: "Florya Double Burger" },
+        description: { ar: "لحم بقري مزدوج، شيدر، خس، طماطم، صلصة خاصة", en: "Double fresh beef, cheddar, lettuce, tomato, special sauce" },
         price: 75,
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
     ],
   },
   {
-    id: 4,
-    type: "category",
-    title: "Chicken & Seafood",
-    subtitle: "Ocean & farm",
+    id: "seafood",
+    title: { ar: "الدجاج والمأكولات البحرية", en: "Chicken & Seafood" },
+    subtitle: { ar: "من البحر والمزرعة", en: "Ocean & farm" },
     dishes: [
       {
         id: "c1",
-        name: "Herb Grilled Chicken",
-        description: "Whole chicken roasted with thyme & lemon, basmati rice",
+        name: { ar: "دجاج مشوي بالأعشاب", en: "Herb Grilled Chicken" },
+        description: { ar: "دجاجة كاملة محمّرة بالزعتر والليمون مع أرز بسمتي", en: "Whole chicken roasted with thyme & lemon, basmati rice" },
         price: 98,
-        image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=400&fit=crop&q=80",
         badges: ["hot"],
       },
       {
         id: "c2",
-        name: "Grilled Fish Fillet",
-        description: "Fresh fish fillet, lemon butter sauce, sautéed vegetables",
+        name: { ar: "فيليه سمك مشوي", en: "Grilled Fish Fillet" },
+        description: { ar: "فيليه سمك طازج بصلصة الليمون والزبدة مع خضار سوتيه", en: "Fresh fish fillet, lemon butter sauce, sautéed vegetables" },
         price: 110,
-        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
       {
         id: "c3",
-        name: "Chicken Alfredo Pasta",
-        description: "Fettuccine pasta, cream sauce, mushrooms, parmesan",
+        name: { ar: "باستا دجاج ألفريدو", en: "Chicken Alfredo Pasta" },
+        description: { ar: "فيتوتشيني بصلصة كريمة وفطر وبارميزان", en: "Fettuccine pasta, cream sauce, mushrooms, parmesan" },
         price: 72,
-        image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=400&fit=crop&q=80",
         badges: ["new"],
       },
     ],
   },
   {
-    id: 5,
-    type: "category",
-    title: "Desserts",
-    subtitle: "Sweet endings",
+    id: "desserts",
+    title: { ar: "الحلويات", en: "Desserts" },
+    subtitle: { ar: "نهاية حلوة", en: "Sweet endings" },
     dishes: [
       {
         id: "d1",
-        name: "Italian Tiramisu",
-        description: "Coffee-soaked biscuits, mascarpone, cocoa",
+        name: { ar: "تيراميسو إيطالي", en: "Italian Tiramisu" },
+        description: { ar: "بسكويت مبلل بالقهوة، ماسكربوني، كاكاو", en: "Coffee-soaked biscuits, mascarpone, cocoa" },
         price: 42,
-        image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&h=400&fit=crop&q=80",
         badges: ["hot"],
       },
       {
         id: "d2",
-        name: "Belgian Waffle",
-        description: "Crispy waffle, vanilla ice cream, chocolate, strawberry",
+        name: { ar: "وافل بلجيكي", en: "Belgian Waffle" },
+        description: { ar: "وافل مقرمش مع آيس كريم فانيلا وشوكولاتة وفراولة", en: "Crispy waffle, vanilla ice cream, chocolate, strawberry" },
         price: 38,
-        image: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
       {
         id: "d3",
-        name: "Caramel Custard",
-        description: "Smooth vanilla custard, crispy caramel layer",
+        name: { ar: "كريم كراميل", en: "Caramel Custard" },
+        description: { ar: "كاسترد فانيلا ناعم بطبقة كراميل مقرمشة", en: "Smooth vanilla custard, crispy caramel layer" },
         price: 35,
-        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
     ],
   },
   {
-    id: 6,
-    type: "category",
-    title: "Beverages",
-    subtitle: "Refreshments",
+    id: "drinks",
+    title: { ar: "المشروبات", en: "Beverages" },
+    subtitle: { ar: "انتعاش", en: "Refreshments" },
     dishes: [
       {
         id: "b1",
-        name: "Florya Arabic Coffee",
-        description: "Authentic Arabic coffee with cardamom & saffron",
+        name: { ar: "قهوة فلوريا العربية", en: "Florya Arabic Coffee" },
+        description: { ar: "قهوة عربية أصيلة بالهيل والزعفران", en: "Authentic Arabic coffee with cardamom & saffron" },
         price: 18,
-        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
       {
         id: "b2",
-        name: "Florya Special Mocktail",
-        description: "Mango, strawberry, mint, lemon, soda",
+        name: { ar: "موكتيل فلوريا الخاص", en: "Florya Special Mocktail" },
+        description: { ar: "مانجو، فراولة، نعناع، ليمون، صودا", en: "Mango, strawberry, mint, lemon, soda" },
         price: 28,
-        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=400&fit=crop&q=80",
         badges: ["new"],
       },
       {
         id: "b3",
-        name: "Fresh Mixed Juice",
-        description: "Orange, carrot, lemon, fresh ginger",
+        name: { ar: "عصير مشكّل طازج", en: "Fresh Mixed Juice" },
+        description: { ar: "برتقال، جزر، ليمون، زنجبيل طازج", en: "Orange, carrot, lemon, fresh ginger" },
         price: 24,
-        image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=200&h=200&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&h=400&fit=crop&q=80",
         badges: [],
       },
     ],
   },
-  {
-    id: 7,
-    type: "contact",
-    title: "Contact",
-    contact: {
-      address: "King Fahd Road, Riyadh, Saudi Arabia",
-      phone: "+966 50 123 4567",
-      hours: "Daily 12 PM - 12 AM",
-      instagram: "@florya_rest",
-    },
-  },
-];
+]
 
-export const badgeLabels: Record<string, string> = {
-  hot: "Bestseller",
-  new: "New",
-  veg: "Vegetarian",
-};
-
-export const badgeColors: Record<string, string> = {
-  hot: "bg-accent-hot/10 text-accent-hot",
-  new: "bg-accent-new/10 text-accent-new",
-  veg: "bg-accent-veg/10 text-accent-veg",
-};
+export const allDishes: Dish[] = categories.flatMap((c) => c.dishes);
