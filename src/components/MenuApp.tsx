@@ -14,6 +14,8 @@ const QRModal = dynamic(() => import("./QRModal"), { ssr: false });
 
 export type Cart = Record<string, number>;
 
+const flipTransition = { duration: 0.55, ease: [0.32, 0.72, 0, 1] as const };
+
 export const rise = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
 export default function MenuApp() {
@@ -23,7 +25,6 @@ export default function MenuApp() {
   const [lang, setLang] = useState<Lang>(restaurant.defaultLang);
   const [cart, setCart] = useState<Cart>({});
   const [page, setPage] = useState(0);
-  const [dir, setDir] = useState(1);
   const [showCart, setShowCart] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -75,7 +76,6 @@ export default function MenuApp() {
   const goTo = useCallback(
     (n: number) => {
       if (n < 0 || n > lastPage || n === page) return;
-      setDir(n > page ? 1 : -1);
       setPage(n);
     },
     [page, lastPage]
@@ -109,12 +109,9 @@ export default function MenuApp() {
   const sign = rtl ? 1 : -1;
   const origin = rtl ? "right center" : "left center";
   const flip = {
-    enter: (d: number) => (d > 0 ? { rotateY: 0, zIndex: 0 } : { rotateY: -sign * 100, zIndex: 2 }),
-    center: { rotateY: 0, zIndex: 1, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } },
-    exit: (d: number) =>
-      d > 0
-        ? { rotateY: sign * 100, zIndex: 2, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } }
-        : { zIndex: 0, transition: { duration: 0.7 } },
+    enter: { rotateY: 0, zIndex: 0 },
+    center: { rotateY: 0, zIndex: 1, transition: { ...flipTransition, zIndex: { duration: 0 } } },
+    exit: { rotateY: sign * 100, zIndex: 2, transition: { ...flipTransition, zIndex: { duration: 0 } } },
   };
 
   const pageUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
@@ -143,21 +140,22 @@ export default function MenuApp() {
             {restaurant.name[lang]}
             {tableParam && <span className="ms-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-burgundy">{t("table")} {tableParam}</span>}
           </span>
-          <button onClick={() => setShowQR(true)} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg hover:bg-white/20" aria-label={t("share")}>⤴</button>
+          <button onClick={() => setShowQR(true)} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg hover:bg-white/20" aria-label={t("share")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
+          </button>
         </div>
 
         {/* the book */}
         <div className="relative flex-1 overflow-hidden p-2" style={{ perspective: 1600 }} onTouchStart={(e) => setTouchX(e.touches[0].clientX)} onTouchEnd={onTouchEnd}>
-          <AnimatePresence initial={false} custom={dir}>
+          <AnimatePresence initial={false}>
             <motion.div
               key={page}
-              custom={dir}
               variants={flip}
               initial="enter"
               animate="center"
               exit="exit"
-              style={{ transformOrigin: origin, backfaceVisibility: "hidden" }}
-              className="absolute inset-2 overflow-hidden rounded-lg bg-beige shadow-[0_6px_24px_rgba(60,30,20,.35)]"
+              style={{ transformOrigin: origin, backfaceVisibility: "hidden", willChange: "transform" }}
+              className="absolute inset-2 overflow-hidden rounded-lg bg-beige shadow-lg"
             >
               {/* spine shadow */}
               <div aria-hidden className={`pointer-events-none absolute inset-y-0 z-10 w-5 ${rtl ? "right-0 bg-gradient-to-l" : "left-0 bg-gradient-to-r"} from-black/15 to-transparent`} />
@@ -221,8 +219,8 @@ export default function MenuApp() {
                         <p className="text-sm">{restaurant.hours[lang]}</p>
                       </div>
                       <div className="flex flex-wrap justify-center gap-2">
-                        <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">📞 {t("call")}</a>
-                        <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">📍 {t("directions")}</a>
+                        <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">{t("call")}</a>
+                        <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">{t("directions")}</a>
                         <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">@{restaurant.instagram}</a>
                       </div>
                     </div>

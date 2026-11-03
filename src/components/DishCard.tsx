@@ -25,17 +25,10 @@ const badgeKey: Record<Badge, UiKey> = { hot: "bestseller", new: "new", veg: "ve
 function DishCard({ dish, lang, qty, onQty, money, t }: Props) {
   const name = dish.name[lang];
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px" }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      whileHover={{ y: -2 }}
+    <article
       className={`flex gap-3 rounded-2xl bg-white p-3 shadow-sm ${dish.soldOut ? "opacity-60" : ""}`}
     >
-      <motion.img
-        whileHover={{ scale: 1.05 }}
-        transition={{ duration: 0.3 }}
+      <img
         src={dish.image}
         alt={name}
         width={104}
@@ -76,7 +69,7 @@ function DishCard({ dish, lang, qty, onQty, money, t }: Props) {
           )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
