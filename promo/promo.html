@@ -6,68 +6,97 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --gold:#D9BE7C; --gold-d:#B08D3C; --wine:#722F37; --wine-d:#3A1218; }
+  :root { --gold:#C9A25B; --gold-d:#9A7A2E; --wine:#722F37; --ink:#3A1218; --muted:#6B5A42; }
   * { box-sizing: border-box; margin: 0; }
-  html, body { width: 1280px; height: 720px; overflow: hidden; background: #1B0B0E; font-family: Inter, system-ui, sans-serif; color: #fff; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #F6EEDF; font-family: Inter, system-ui, sans-serif; color: var(--ink); }
+  #stage { position:absolute; left:0; top:0; width:1280px; height:720px; transform:scale(1.5); transform-origin:0 0; overflow:hidden; }
   .bg { position: absolute; inset: 0; background:
-      radial-gradient(900px 600px at 78% 40%, rgba(176,141,60,.22), transparent 70%),
-      linear-gradient(135deg, #2A1215, #4A1D25 55%, #1B0B0E); }
-  .bg::after { content:""; position:absolute; inset:0; opacity:.5;
-      background-image: radial-gradient(circle, rgba(217,190,124,.14) 0 2px, transparent 3px); background-size: 34px 34px; }
-  .frame { position:absolute; inset:18px; border:1px solid rgba(217,190,124,.35); border-radius:6px; pointer-events:none; }
+      radial-gradient(760px 560px at 76% 46%, rgba(201,162,91,.30), transparent 70%),
+      radial-gradient(520px 420px at 8% 100%, rgba(114,47,55,.10), transparent 70%),
+      linear-gradient(135deg, #FCF8F0, #F3E8D4 60%, #EBDCC1); }
+  .bg::after { content:""; position:absolute; inset:0; opacity:.55;
+      background-image: radial-gradient(circle, rgba(154,122,46,.16) 0 1.5px, transparent 2.5px); background-size: 30px 30px; }
+  .frame { position:absolute; inset:18px; border:1px solid rgba(154,122,46,.45); border-radius:6px; pointer-events:none; }
 
-  #cap { position:absolute; left:84px; top:50%; width:540px; transition: top .5s, opacity .5s, transform .5s; transform:translateY(-50%); }
+  #cap { position:absolute; left:84px; top:50%; width:540px; transform:translateY(-50%); transition: top .5s, opacity .5s, transform .5s; }
   #cap.out { opacity:0; transform:translateY(calc(-50% + 14px)); }
-  #cap .kicker { font-size:14px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; }
-  #cap h2 { font-family:"Playfair Display", Georgia, serif; font-weight:700; font-size:50px; line-height:1.12; color:#fff; }
-  #cap h2 em { color:var(--gold); font-style:normal; }
-  #cap p { margin-top:20px; font-size:21px; line-height:1.5; color:rgba(255,255,255,.82); }
+  #cap .kicker { font-size:14px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold-d); font-weight:600; margin-bottom:18px; }
+  #cap h2 { font-family:"Playfair Display", Georgia, serif; font-weight:700; font-size:50px; line-height:1.12; color:var(--ink); }
+  #cap h2 em { color:var(--wine); font-style:normal; }
+  #cap p { margin-top:20px; font-size:21px; line-height:1.5; color:var(--muted); }
   .rule { display:flex; align-items:center; gap:10px; margin-top:22px; color:var(--gold); }
-  .rule i { display:block; height:1px; width:56px; background:currentColor; opacity:.6; }
+  .rule i { display:block; height:1px; width:56px; background:currentColor; opacity:.8; }
   .rule b { width:9px; height:9px; background:currentColor; transform:rotate(45deg); }
 
-  #phone { position:absolute; right:150px; top:40px; width:312px; height:648px; border-radius:44px; background:#0c0506;
-      border:3px solid #8a6c2a; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 7px #1d0d10; overflow:hidden;
+  /* phone: light titanium body, thin dark glass bezel */
+  #phone { position:absolute; right:150px; top:34px; width:316px; height:652px; border-radius:52px; padding:5px;
+      background: linear-gradient(145deg, #fbfaf7 0%, #d8d5cd 38%, #f1efe9 62%, #c9c6bd 100%);
+      box-shadow: 0 50px 70px -20px rgba(90,55,30,.32), 0 12px 24px rgba(90,55,30,.18), inset 0 0 0 1px rgba(255,255,255,.9), inset 0 0 0 2px rgba(0,0,0,.07);
       transform: translateX(560px) rotate(4deg); opacity:0; transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .8s; }
   #phone.in { transform:none; opacity:1; }
   #phone.hide { transform: translateX(560px) rotate(4deg); opacity:0; }
-  #phone iframe { position:absolute; left:12px; top:34px; width:390px; height:844px; border:0; transform:scale(.72); transform-origin:0 0; background:#fff; border-radius:8px; }
-  #phone::after { content:""; position:absolute; top:10px; left:50%; width:84px; height:22px; margin-left:-42px; background:#0c0506; border-radius:12px; z-index:3; }
+  #phone .btn { position:absolute; width:4px; border-radius:2px; background:linear-gradient(90deg,#bdb9af,#eceae4); }
+  #phone .b1 { left:-3px; top:112px; height:28px; } #phone .b2 { left:-3px; top:164px; height:54px; } #phone .b3 { left:-3px; top:228px; height:54px; }
+  #phone .b4 { right:-3px; top:190px; height:84px; background:linear-gradient(270deg,#bdb9af,#eceae4); }
+  #bezel { position:relative; width:100%; height:100%; border-radius:47px; background:#16161a; padding:6px; overflow:hidden; }
+  #screen { position:relative; width:100%; height:100%; border-radius:41px; overflow:hidden; background:#5A252C; }
+  #status { position:absolute; left:0; right:0; top:0; height:28px; background:#5A252C; color:#fff; z-index:3; display:flex; align-items:center; justify-content:space-between; padding:2px 22px 0 26px; font-size:12px; font-weight:600; }
+  #status svg { display:block; }
+  #island { position:absolute; top:7px; left:50%; width:78px; height:21px; margin-left:-39px; background:#08080a; border-radius:12px; z-index:4; }
+  #screen iframe { position:absolute; left:0; top:28px; width:390px; height:798px; border:0; transform:scale(.7538); transform-origin:0 0; background:#fff; }
+  #home { position:absolute; bottom:6px; left:50%; width:96px; height:4px; margin-left:-48px; border-radius:2px; background:rgba(40,25,25,.55); z-index:4; }
+  #glass { position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:41px; background:linear-gradient(115deg, rgba(255,255,255,.14) 0%, rgba(255,255,255,0) 32%); }
 
-  #laptop { position:absolute; right:80px; top:120px; width:640px; height:410px; border-radius:12px 12px 4px 4px; background:#fff;
-      border:10px solid #1d0d10; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow:hidden; opacity:0; transform:translateY(40px); transition:.9s cubic-bezier(.2,.8,.2,1); }
+  #laptop { position:absolute; right:80px; top:120px; width:640px; height:410px; border-radius:14px 14px 4px 4px; background:#fff;
+      border:9px solid #d8d5cd; box-shadow: 0 40px 60px -20px rgba(90,55,30,.35), inset 0 0 0 1px rgba(0,0,0,.08); overflow:visible; opacity:0; transform:translateY(40px); transition:.9s cubic-bezier(.2,.8,.2,1); }
+  #laptop::after { content:""; position:absolute; left:-60px; right:-60px; bottom:-26px; height:16px; border-radius:0 0 18px 18px; background:linear-gradient(#e6e3dc,#c4c0b6); }
   #laptop.in { opacity:1; transform:none; }
+  #laptop .scr { position:absolute; inset:0; overflow:hidden; }
   #laptop iframe { position:absolute; left:0; top:0; width:1000px; height:620px; border:0; transform:scale(.62); transform-origin:0 0; }
 
   #wa { position:absolute; left:84px; bottom:30px; width:430px; padding:14px 18px; border-radius:16px 16px 16px 4px; background:#DCF8C6; color:#1b2a1b;
-      font-size:14px; line-height:1.4; box-shadow:0 14px 40px rgba(0,0,0,.45); opacity:0; transform:translateY(24px); transition:.6s; }
+      font-size:14px; line-height:1.4; box-shadow:0 14px 34px rgba(90,55,30,.25); opacity:0; transform:translateY(24px); transition:.6s; }
   #wa.in { opacity:1; transform:none; }
   #wa .h { font-weight:600; color:#0b6b3a; font-size:13px; margin-bottom:6px; }
-  #wa .t { margin-top:8px; font-weight:600; }
 
-  #tap { position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; border:3px solid var(--gold); background:rgba(217,190,124,.25);
+  #tap { position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; border:3px solid var(--wine); background:rgba(255,255,255,.55);
       opacity:0; pointer-events:none; z-index:20; }
   #tap.go { animation: tap .55s ease-out; }
   @keyframes tap { 0%{opacity:1; transform:scale(.4)} 100%{opacity:0; transform:scale(1.5)} }
 
-  #end { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transition:opacity .9s; pointer-events:none; background:rgba(27,11,14,.97); }
+  #end { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transition:opacity .9s; pointer-events:none; background:rgba(252,248,240,.98); }
   #end.in { opacity:1; }
-  #end h2 { font-family:"Playfair Display", Georgia, serif; font-size:64px; color:#fff; }
-  #end h2 em { color:var(--gold); font-style:normal; }
-  #end p { margin-top:18px; font-size:24px; color:rgba(255,255,255,.85); }
-  #end .btn { margin-top:38px; padding:16px 42px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); font-size:22px; letter-spacing:.04em; background:rgba(0,0,0,.25); }
+  #end h2 { font-family:"Playfair Display", Georgia, serif; font-size:64px; color:var(--ink); }
+  #end h2 em { color:var(--wine); font-style:normal; }
+  #end p { margin-top:18px; font-size:24px; color:var(--muted); }
+  #end .btn { margin-top:38px; padding:16px 42px; border-radius:999px; background:var(--wine); color:#fff; font-size:22px; letter-spacing:.04em; box-shadow:0 12px 26px rgba(114,47,55,.3); }
 </style>
 </head>
 <body>
+<div id="stage">
 <div class="bg"></div><div class="frame"></div>
 
 <div id="cap"></div>
-<div id="phone"><iframe id="app" src="/?table=7"></iframe></div>
-<div id="laptop"><iframe id="qr" src="/qr?tables=6"></iframe></div>
+<div id="phone">
+  <i class="btn b1"></i><i class="btn b2"></i><i class="btn b3"></i><i class="btn b4"></i>
+  <div id="bezel"><div id="screen">
+    <div id="status"><span>9:41</span>
+      <span style="display:flex;gap:5px;align-items:center">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="#fff"><rect x="0" y="6" width="3" height="4" rx=".6"/><rect x="4.3" y="4" width="3" height="6" rx=".6"/><rect x="8.6" y="2" width="3" height="8" rx=".6"/><rect x="12.9" y="0" width="3" height="10" rx=".6"/></svg>
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M1 4a9 9 0 0 1 13 0"/><path d="M3.3 6.4a5.7 5.7 0 0 1 8.4 0"/><circle cx="7.5" cy="9" r="1" fill="#fff" stroke="none"/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11"><rect x=".5" y=".5" width="20" height="10" rx="3" fill="none" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="15" height="7" rx="1.8" fill="#fff"/><rect x="21.5" y="3.5" width="1.8" height="4" rx=".9" fill="#fff" opacity=".6"/></svg>
+      </span></div>
+    <div id="island"></div>
+    <iframe id="app" src="/?table=7"></iframe>
+    <div id="home"></div><div id="glass"></div>
+  </div></div>
+</div>
+<div id="laptop"><div class="scr"><iframe id="qr" src="/qr?tables=6"></iframe></div></div>
 <div id="wa"></div>
 <div id="tap"></div>
 <div id="end"><div class="rule" style="margin:0 0 22px"><i></i><b></b><i></i></div><h2>Your menu, <em>your style.</em></h2><p>Your logo, your colors, your dishes.</p><div class="btn">Order yours on Khamsat</div></div>
 
+</div>
 <script>
 const $ = (s) => document.querySelector(s);
 let t0 = performance.now();
@@ -89,11 +118,13 @@ function find(sel, text) {
 }
 async function tap(el, after = 650) {
   if (!el) return;
+  const S = $("#stage").getBoundingClientRect().width / 1280;   // stage is scaled up for a sharper 1080p video
+  const st = $("#stage").getBoundingClientRect();
   const f = $("#app").getBoundingClientRect();
   const r = el.getBoundingClientRect();
-  const k = f.width / 390;
-  const x = f.left + (r.left + r.width / 2) * k;
-  const y = f.top + (r.top + r.height / 2) * k;
+  const k = 0.7538;                                              // phone screen scale inside the stage
+  const x = (f.left - st.left) / S + (r.left + r.width / 2) * k;
+  const y = (f.top - st.top) / S + (r.top + r.height / 2) * k;
   const d = $("#tap");
   d.style.left = x + "px"; d.style.top = y + "px";
   d.classList.remove("go"); void d.offsetWidth; d.classList.add("go");
@@ -115,7 +146,17 @@ async function typeInto(el, text) {
 
 async function waitApp() {
   for (let i = 0; i < 100; i++) {
-    try { if (appDoc().querySelector('[aria-label="Switch language"]')) return; } catch {}
+    try {
+      if (appDoc().querySelector('[aria-label="Switch language"]')) {
+        if (new URLSearchParams(location.search).has("baked")) {
+          // offline mode: the cover photo already carries the tint, and only some dish photos exist
+          const st = appDoc().createElement("style");
+          st.textContent = 'img[class*="opacity-60"]{opacity:1!important} div[class*="from-burgundy-dark"]{display:none!important} article:nth-child(3){display:none!important}';
+          appDoc().head.appendChild(st);
+        }
+        return;
+      }
+    } catch {}
     await sleep(100);
   }
 }
