@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Florya menu promo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --gold:#D9BE7C; --gold-d:#B08D3C; --wine:#722F37; --wine-d:#3A1218; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: #1B0B0E; font-family: Inter, system-ui, sans-serif; color: #fff; }
+  .bg { position: absolute; inset: 0; background:
+      radial-gradient(900px 600px at 78% 40%, rgba(176,141,60,.22), transparent 70%),
+      linear-gradient(135deg, #2A1215, #4A1D25 55%, #1B0B0E); }
+  .bg::after { content:""; position:absolute; inset:0; opacity:.5;
+      background-image: radial-gradient(circle, rgba(217,190,124,.14) 0 2px, transparent 3px); background-size: 34px 34px; }
+  .frame { position:absolute; inset:18px; border:1px solid rgba(217,190,124,.35); border-radius:6px; pointer-events:none; }
+
+  #cap { position:absolute; left:84px; top:50%; width:540px; transition: top .5s, opacity .5s, transform .5s; transform:translateY(-50%); }
+  #cap.out { opacity:0; transform:translateY(calc(-50% + 14px)); }
+  #cap .kicker { font-size:14px; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; }
+  #cap h2 { font-family:"Playfair Display", Georgia, serif; font-weight:700; font-size:50px; line-height:1.12; color:#fff; }
+  #cap h2 em { color:var(--gold); font-style:normal; }
+  #cap p { margin-top:20px; font-size:21px; line-height:1.5; color:rgba(255,255,255,.82); }
+  .rule { display:flex; align-items:center; gap:10px; margin-top:22px; color:var(--gold); }
+  .rule i { display:block; height:1px; width:56px; background:currentColor; opacity:.6; }
+  .rule b { width:9px; height:9px; background:currentColor; transform:rotate(45deg); }
+
+  #phone { position:absolute; right:150px; top:40px; width:312px; height:648px; border-radius:44px; background:#0c0506;
+      border:3px solid #8a6c2a; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 7px #1d0d10; overflow:hidden;
+      transform: translateX(560px) rotate(4deg); opacity:0; transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .8s; }
+  #phone.in { transform:none; opacity:1; }
+  #phone.hide { transform: translateX(560px) rotate(4deg); opacity:0; }
+  #phone iframe { position:absolute; left:12px; top:34px; width:390px; height:844px; border:0; transform:scale(.72); transform-origin:0 0; background:#fff; border-radius:8px; }
+  #phone::after { content:""; position:absolute; top:10px; left:50%; width:84px; height:22px; margin-left:-42px; background:#0c0506; border-radius:12px; z-index:3; }
+
+  #laptop { position:absolute; right:80px; top:120px; width:640px; height:410px; border-radius:12px 12px 4px 4px; background:#fff;
+      border:10px solid #1d0d10; box-shadow: 0 30px 80px rgba(0,0,0,.6); overflow:hidden; opacity:0; transform:translateY(40px); transition:.9s cubic-bezier(.2,.8,.2,1); }
+  #laptop.in { opacity:1; transform:none; }
+  #laptop iframe { position:absolute; left:0; top:0; width:1000px; height:620px; border:0; transform:scale(.62); transform-origin:0 0; }
+
+  #wa { position:absolute; left:84px; bottom:30px; width:430px; padding:14px 18px; border-radius:16px 16px 16px 4px; background:#DCF8C6; color:#1b2a1b;
+      font-size:14px; line-height:1.4; box-shadow:0 14px 40px rgba(0,0,0,.45); opacity:0; transform:translateY(24px); transition:.6s; }
+  #wa.in { opacity:1; transform:none; }
+  #wa .h { font-weight:600; color:#0b6b3a; font-size:13px; margin-bottom:6px; }
+  #wa .t { margin-top:8px; font-weight:600; }
+
+  #tap { position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%; border:3px solid var(--gold); background:rgba(217,190,124,.25);
+      opacity:0; pointer-events:none; z-index:20; }
+  #tap.go { animation: tap .55s ease-out; }
+  @keyframes tap { 0%{opacity:1; transform:scale(.4)} 100%{opacity:0; transform:scale(1.5)} }
+
+  #end { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transition:opacity .9s; pointer-events:none; background:rgba(27,11,14,.97); }
+  #end.in { opacity:1; }
+  #end h2 { font-family:"Playfair Display", Georgia, serif; font-size:64px; color:#fff; }
+  #end h2 em { color:var(--gold); font-style:normal; }
+  #end p { margin-top:18px; font-size:24px; color:rgba(255,255,255,.85); }
+  #end .btn { margin-top:38px; padding:16px 42px; border-radius:999px; border:1.5px solid var(--gold); color:var(--gold); font-size:22px; letter-spacing:.04em; background:rgba(0,0,0,.25); }
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="frame"></div>
+
+<div id="cap"></div>
+<div id="phone"><iframe id="app" src="/?table=7"></iframe></div>
+<div id="laptop"><iframe id="qr" src="/qr?tables=6"></iframe></div>
+<div id="wa"></div>
+<div id="tap"></div>
+<div id="end"><div class="rule" style="margin:0 0 22px"><i></i><b></b><i></i></div><h2>Your menu, <em>your style.</em></h2><p>Your logo, your colors, your dishes.</p><div class="btn">Order yours on Khamsat</div></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let t0 = performance.now();
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const until = (sec) => sleep(Math.max(0, sec * 1000 - (performance.now() - t0)));
+const appDoc = () => $("#app").contentDocument;
+
+async function say(kicker, html, sub) {
+  const c = $("#cap");
+  c.classList.add("out");
+  await sleep(450);
+  c.innerHTML = `<div class="kicker">${kicker}</div><h2>${html}</h2><div class="rule"><i></i><b></b><i></i></div>${sub ? `<p>${sub}</p>` : ""}`;
+  c.classList.remove("out");
+}
+
+function find(sel, text) {
+  const els = [...appDoc().querySelectorAll(sel)];
+  return text ? els.find((e) => e.textContent.trim().includes(text)) : els[0];
+}
+async function tap(el, after = 650) {
+  if (!el) return;
+  const f = $("#app").getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const k = f.width / 390;
+  const x = f.left + (r.left + r.width / 2) * k;
+  const y = f.top + (r.top + r.height / 2) * k;
+  const d = $("#tap");
+  d.style.left = x + "px"; d.style.top = y + "px";
+  d.classList.remove("go"); void d.offsetWidth; d.classList.add("go");
+  await sleep(180);
+  el.click();
+  await sleep(after);
+}
+const next = () => tap(find('[aria-label="Next page"]'), 1100);
+
+async function typeInto(el, text) {
+  const win = el.ownerDocument.defaultView;
+  const setter = Object.getOwnPropertyDescriptor(win.HTMLTextAreaElement.prototype, "value").set;
+  for (let i = 1; i <= text.length; i++) {
+    setter.call(el, text.slice(0, i));
+    el.dispatchEvent(new win.Event("input", { bubbles: true }));
+    await sleep(85);
+  }
+}
+
+async function waitApp() {
+  for (let i = 0; i < 100; i++) {
+    try { if (appDoc().querySelector('[aria-label="Switch language"]')) return; } catch {}
+    await sleep(100);
+  }
+}
+
+(async () => {
+  await waitApp();
+  t0 = performance.now();
+  document.title = "GO";
+  const phone = $("#phone");
+
+  // 0-5  hook
+  await say("Digital menu", "Still handing out <em>printed menus?</em>", "There is a better way to serve your guests.");
+  await until(5);
+
+  // 5-11  intro + QR
+  phone.classList.add("in");
+  await say("Meet the menu", "Scan the QR code at the table. <em>That's it.</em>", "No app to install. It opens right in the browser.");
+  await until(7);
+  await tap(find('[aria-label="Switch language"]'), 900);          // AR -> EN
+  await until(11);
+
+  // 11-19  flipbook
+  await say("Flipbook", "Flip through it like a <em>real book.</em>", "Swipe, tap the arrows, or jump from the index.");
+  await tap(find("button", "Open the menu"), 1500);
+  await tap(find("button", "Starters"), 1500);
+  await next(); await next();
+  await until(19);
+
+  // 19-28  ordering
+  await say("Ordering", "Pick dishes, set quantities, <em>add a note.</em>", "Everything stays in the cart while guests keep browsing.");
+  await tap(find("button", "Add"), 900);
+  await tap(find('[aria-label^="Increase"]'), 1800);
+  await tap(find("button", "Add"), 1200);   // second dish
+  await until(28);
+
+  // 28-37  WhatsApp
+  $("#cap").style.top = "30%";
+  await say("Checkout", "One tap sends the order to <em>your WhatsApp.</em>", "With the table number and the total, ready to prepare.");
+  await tap(find("button", "View order"), 1400);
+  const note = appDoc().querySelector("textarea");
+  if (note) await typeInto(note, "No onions, please");
+  await sleep(500);
+  const wa = $("#wa");
+  wa.innerHTML = `<div class="h">Florya</div>Hi, I'd like to order: (Florya)<br>Dine in / Table 7<br><br>&bull; 2&times; Herb Grilled Chicken: 196 SAR<br>&bull; 1&times; Grilled Fish Fillet: 110 SAR<br><br><b>Total: 306 SAR</b><br><br>Notes (optional): No onions, please`;
+  wa.classList.add("in");
+  await until(37);
+
+  // 37-45  languages
+  wa.classList.remove("in");
+  $("#cap").style.top = "50%";
+  const close = find('[aria-label="Close"]'); if (close) await tap(close, 600);
+  await say("Two languages", "Arabic and English, <em>right-to-left</em> done properly.", "The page even turns the other way.");
+  await tap(find('[aria-label="Switch language"]'), 1400);
+  await until(45);
+
+  // 45-52  QR sheet
+  phone.classList.add("hide");
+  await sleep(500);
+  $("#laptop").classList.add("in");
+  await say("Table QR codes", "Print a QR code for <em>every table.</em>", "One page, ready to print and place.");
+  await until(52);
+
+  // 52-60  end card
+  $("#laptop").classList.remove("in");
+  $("#cap").classList.add("out");
+  $("#end").classList.add("in");
+  await until(60);
+  document.title = "DONE";
+})();
+</script>
+</body>
+</html>
