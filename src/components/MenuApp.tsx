@@ -9,10 +9,14 @@ import { categories, allDishes } from "../data/menu";
 import { ui, type Lang, type UiKey } from "../lib/i18n";
 import DishCard from "./DishCard";
 import CartSheet from "./CartSheet";
+import Facade from "./Facade";
+import Ornament from "./Ornament";
 
 const QRModal = dynamic(() => import("./QRModal"), { ssr: false });
 
 export type Cart = Record<string, number>;
+
+const flipTransition = { duration: 0.55, ease: [0.32, 0.72, 0, 1] as const };
 
 export const rise = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
@@ -23,7 +27,6 @@ export default function MenuApp() {
   const [lang, setLang] = useState<Lang>(restaurant.defaultLang);
   const [cart, setCart] = useState<Cart>({});
   const [page, setPage] = useState(0);
-  const [dir, setDir] = useState(1);
   const [showCart, setShowCart] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -75,7 +78,6 @@ export default function MenuApp() {
   const goTo = useCallback(
     (n: number) => {
       if (n < 0 || n > lastPage || n === page) return;
-      setDir(n > page ? 1 : -1);
       setPage(n);
     },
     [page, lastPage]
@@ -109,12 +111,9 @@ export default function MenuApp() {
   const sign = rtl ? 1 : -1;
   const origin = rtl ? "right center" : "left center";
   const flip = {
-    enter: (d: number) => (d > 0 ? { rotateY: 0, zIndex: 0 } : { rotateY: -sign * 100, zIndex: 2 }),
-    center: { rotateY: 0, zIndex: 1, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } },
-    exit: (d: number) =>
-      d > 0
-        ? { rotateY: sign * 100, zIndex: 2, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } }
-        : { zIndex: 0, transition: { duration: 0.7 } },
+    enter: { rotateY: 0, zIndex: 0 },
+    center: { rotateY: 0, zIndex: 1, transition: { ...flipTransition, zIndex: { duration: 0 } } },
+    exit: { rotateY: sign * 100, zIndex: 2, transition: { ...flipTransition, zIndex: { duration: 0 } } },
   };
 
   const pageUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
@@ -123,77 +122,90 @@ export default function MenuApp() {
   const category = page >= 2 && page <= lastPage - 1 ? categories[page - 2] : null;
 
   const pageHeader = (title: string, subtitle?: string) => (
-    <div className="relative overflow-hidden bg-burgundy px-6 pb-5 pt-5 text-center text-white">
-      <div aria-hidden className="absolute -top-12 -end-12 h-40 w-40 rounded-full bg-white/5" />
-      <p className="text-xs tracking-widest text-white/70">{pageNo(page)}</p>
-      <h2 className="mt-1 text-2xl font-bold">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-sm text-white/80">{subtitle}</p>}
+    <div className="mx-4 mt-4 border-b-2 border-double border-gold/60 pb-4 text-center">
+      <p className="text-xs tracking-widest text-text-muted">{pageNo(page)}</p>
+      <h2 className="mt-1 font-display text-3xl font-bold text-burgundy">{title}</h2>
+      <Ornament className="mt-2" />
+      {subtitle && <p className="mt-2 text-sm italic text-text-secondary">{subtitle}</p>}
     </div>
   );
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="mx-auto flex h-dvh max-w-lg flex-col overflow-hidden bg-[#EADFD2] shadow-2xl">
+      <div className="mx-auto flex h-dvh max-w-lg flex-col overflow-hidden damask shadow-2xl">
         {/* top bar */}
         <div className="flex items-center justify-between bg-burgundy-dark px-4 py-2 text-white">
           <button onClick={() => setLang(rtl ? "en" : "ar")} className="min-h-11 rounded-full border border-white/30 bg-white/10 px-4 text-sm font-semibold hover:bg-white/20" aria-label="Switch language">
             {t("lang")}
           </button>
-          <span className="text-sm font-semibold tracking-wide">
+          <span className="font-display text-lg font-bold tracking-wide text-gold-light">
             {restaurant.name[lang]}
             {tableParam && <span className="ms-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-burgundy">{t("table")} {tableParam}</span>}
           </span>
-          <button onClick={() => setShowQR(true)} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg hover:bg-white/20" aria-label={t("share")}>⤴</button>
+          <button onClick={() => setShowQR(true)} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg hover:bg-white/20" aria-label={t("share")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" /></svg>
+          </button>
         </div>
 
         {/* the book */}
         <div className="relative flex-1 overflow-hidden p-2" style={{ perspective: 1600 }} onTouchStart={(e) => setTouchX(e.touches[0].clientX)} onTouchEnd={onTouchEnd}>
-          <AnimatePresence initial={false} custom={dir}>
+          <AnimatePresence initial={false}>
             <motion.div
               key={page}
-              custom={dir}
               variants={flip}
               initial="enter"
               animate="center"
               exit="exit"
-              style={{ transformOrigin: origin, backfaceVisibility: "hidden" }}
-              className="absolute inset-2 overflow-hidden rounded-lg bg-beige shadow-[0_6px_24px_rgba(60,30,20,.35)]"
+              style={{ transformOrigin: origin, backfaceVisibility: "hidden", willChange: "transform" }}
+              className="paper absolute inset-2 overflow-hidden rounded-md border border-gold/50 shadow-lg"
             >
               {/* spine shadow */}
               <div aria-hidden className={`pointer-events-none absolute inset-y-0 z-10 w-5 ${rtl ? "right-0 bg-gradient-to-l" : "left-0 bg-gradient-to-r"} from-black/15 to-transparent`} />
               <div className="no-scrollbar h-full overflow-y-auto">
                 {page === 0 && (
-                  <div className="flex min-h-full flex-col">
-                    <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.35 } } }} className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-burgundy px-6 py-16 text-center text-white">
-                      <motion.div aria-hidden animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 9, repeat: Infinity }} className="absolute -top-16 -end-16 h-56 w-56 rounded-full bg-white/5" />
-                      <motion.div aria-hidden animate={{ scale: [1.1, 1, 1.1] }} transition={{ duration: 11, repeat: Infinity }} className="absolute -bottom-24 -start-10 h-64 w-64 rounded-full bg-white/5" />
-                      <motion.div variants={{ hidden: { scale: 0.5, opacity: 0, rotate: -20 }, show: { scale: 1, opacity: 1, rotate: 0 } }} transition={{ type: "spring", stiffness: 180, damping: 14 }} className="relative mb-5 grid h-24 w-24 place-items-center rounded-full border-2 border-white/40 bg-white/10 text-5xl font-bold">
-                        {restaurant.name[lang].charAt(0)}
-                      </motion.div>
-                      <motion.h1 variants={rise} className="relative text-4xl font-bold tracking-wide">{restaurant.name[lang]}</motion.h1>
-                      <motion.p variants={rise} className="relative mt-1 text-sm uppercase tracking-[0.3em] text-white/80">{restaurant.type[lang]}</motion.p>
-                      <motion.p variants={rise} className="relative mt-4 max-w-xs text-sm leading-relaxed text-white/85">{restaurant.tagline[lang]}</motion.p>
-                    </motion.div>
-                    <div className="px-8 py-8 text-center">
-                      <motion.button whileTap={{ scale: 0.96 }} onClick={() => goTo(1)} className="min-h-12 rounded-xl bg-burgundy px-8 font-semibold text-white shadow-md">
-                        {t("explore")} {rtl ? "←" : "→"}
-                      </motion.button>
+                  <div className="relative flex min-h-full flex-col overflow-hidden bg-[#1B0B0E] text-white">
+                    <div className="relative h-[52%] min-h-[260px] shrink-0">
+                      {restaurant.coverImage ? (
+                        <img src={restaurant.coverImage} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Facade />
+                      )}
+                      <div aria-hidden className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#1B0B0E] to-transparent" />
                     </div>
+                    <motion.div
+                      initial="hidden"
+                      animate="show"
+                      variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } } }}
+                      className="relative flex flex-1 flex-col items-center px-8 pb-8 text-center"
+                    >
+                      <motion.p variants={rise} className="text-xs uppercase tracking-[0.35em] text-gold-light">{restaurant.type[lang]}</motion.p>
+                      <motion.h1 variants={rise} className="mt-2 font-display text-5xl font-bold text-gold-light">{restaurant.name[lang]}</motion.h1>
+                      <motion.div variants={rise} className="w-full"><Ornament className="my-3" /></motion.div>
+                      <motion.p variants={rise} className="max-w-xs text-[15px] leading-relaxed text-white/85">{restaurant.tagline[lang]}</motion.p>
+                      <motion.button
+                        variants={rise}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => goTo(1)}
+                        className="mt-auto min-h-12 rounded-full border border-gold bg-gold/15 px-9 pt-0 font-semibold tracking-wide text-gold-light transition hover:bg-gold/30"
+                      >
+                        {t("explore")}
+                      </motion.button>
+                    </motion.div>
                   </div>
                 )}
 
                 {page === 1 && (
                   <div className="min-h-full">
                     {pageHeader(t("menu"), restaurant.tagline[lang])}
-                    <nav className="px-5 py-4" aria-label={t("menu")}>
+                    <nav className="px-6 py-4" aria-label={t("menu")}>
                       {categories.map((c, i) => (
-                        <button key={c.id} onClick={() => goTo(i + 2)} className="flex min-h-14 w-full items-center gap-3 border-b border-beige-dark px-1 text-start transition hover:bg-white/60">
-                          <span className="grid h-9 w-9 place-items-center rounded-full bg-burgundy/10 text-sm font-bold text-burgundy">{(i + 1).toLocaleString(rtl ? "ar-EG" : "en-US")}</span>
-                          <span className="flex-1">
-                            <span className="block text-[15px] font-semibold">{c.title[lang]}</span>
-                            <span className="block text-xs text-text-secondary">{c.subtitle[lang]}</span>
+                        <button key={c.id} onClick={() => goTo(i + 2)} className="block min-h-16 w-full py-2 text-start transition hover:bg-gold/10">
+                          <span className="flex items-baseline gap-2">
+                            <span className="font-display text-lg font-bold text-burgundy">{c.title[lang]}</span>
+                            <span aria-hidden className="mb-1 flex-1 border-b-2 border-dotted border-gold/60" />
+                            <span className="font-display text-base text-gold-dark">{(i + 3).toLocaleString(rtl ? "ar-EG" : "en-US")}</span>
                           </span>
-                          <span className="text-text-muted">{rtl ? "‹" : "›"}</span>
+                          <span className="block text-xs italic text-text-secondary">{c.subtitle[lang]}</span>
                         </button>
                       ))}
                     </nav>
@@ -203,7 +215,7 @@ export default function MenuApp() {
                 {category && (
                   <div className="min-h-full pb-4">
                     {pageHeader(category.title[lang], category.subtitle[lang])}
-                    <div className="space-y-3 px-3 pt-3">
+                    <div className="px-4 pt-1">
                       {category.dishes.map((d) => (
                         <DishCard key={d.id} dish={d} lang={lang} qty={cart[d.id] ?? 0} onQty={setQty} money={money} t={t} />
                       ))}
@@ -214,15 +226,15 @@ export default function MenuApp() {
                 {page === lastPage && (
                   <div className="min-h-full">
                     {pageHeader(t("contact"))}
-                    <div className="space-y-4 p-6 text-center">
+                    <div className="space-y-5 p-6 text-center">
                       <p className="text-sm text-text-secondary">{restaurant.address[lang]}</p>
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">{t("hours")}</p>
                         <p className="text-sm">{restaurant.hours[lang]}</p>
                       </div>
                       <div className="flex flex-wrap justify-center gap-2">
-                        <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">📞 {t("call")}</a>
-                        <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">📍 {t("directions")}</a>
+                        <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">{t("call")}</a>
+                        <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">{t("directions")}</a>
                         <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">@{restaurant.instagram}</a>
                       </div>
                     </div>
