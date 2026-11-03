@@ -1,64 +1,72 @@
 "use client";
 
-import { Dish, badgeLabels, badgeColors } from "../data/menu";
+import { memo } from "react";
+import type { Dish, Badge } from "../data/menu";
+import type { Lang, UiKey } from "../lib/i18n";
 
-interface DishCardProps {
+interface Props {
   dish: Dish;
-  onAdd: (dish: Dish) => void;
-  added: boolean;
+  lang: Lang;
+  qty: number;
+  onQty: (id: string, qty: number) => void;
+  money: (n: number) => string;
+  t: (k: UiKey) => string;
 }
 
-export default function DishCard({ dish, onAdd, added }: DishCardProps) {
-  return (
-    <div className="bg-white rounded-xl p-4 flex gap-4 items-start border border-transparent hover:border-beige-dark transition-all duration-200 shadow-sm hover:shadow-md">
-      {/* صورة حقيقية دائرية */}
-      <div className="w-[72px] h-[72px] rounded-full overflow-hidden shrink-0 border-2 border-beige-dark bg-beige">
-        <img
-          src={dish.image}
-          alt={dish.name}
-          width={72}
-          height={72}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-      </div>
+const badgeStyle: Record<Badge, string> = {
+  hot: "bg-accent-hot/10 text-accent-hot",
+  new: "bg-accent-new/10 text-accent-new",
+  veg: "bg-accent-veg/10 text-accent-veg",
+  spicy: "bg-accent-hot/10 text-accent-hot",
+};
+const badgeKey: Record<Badge, UiKey> = { hot: "bestseller", new: "new", veg: "veg", spicy: "spicy" };
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-2 mb-1">
-          <h3 className="text-[15px] font-semibold text-text-primary leading-tight">
-            {dish.name}
-          </h3>
-          <span className="text-sm font-bold text-burgundy shrink-0">
-            {dish.price} SAR
-          </span>
+function DishCard({ dish, lang, qty, onQty, money, t }: Props) {
+  const name = dish.name[lang];
+  return (
+    <article className={`flex gap-3 rounded-2xl bg-white p-3 shadow-sm ${dish.soldOut ? "opacity-60" : ""}`}>
+      <img
+        src={dish.image}
+        alt={name}
+        width={104}
+        height={104}
+        loading="lazy"
+        decoding="async"
+        className="h-[104px] w-[104px] shrink-0 rounded-xl bg-beige-dark object-cover"
+      />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-wrap gap-1.5">
+          {dish.badges.map((b) => (
+            <span key={b} className={`rounded px-2 py-0.5 text-[11px] font-semibold ${badgeStyle[b]}`}>
+              {t(badgeKey[b])}
+            </span>
+          ))}
         </div>
-        <p className="text-xs text-text-secondary leading-relaxed mb-3">
-          {dish.description}
-        </p>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-1.5 flex-wrap">
-            {dish.badges.map((badge) => (
-              <span
-                key={badge}
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded ${badgeColors[badge]}`}
-              >
-                {badgeLabels[badge]}
-              </span>
-            ))}
-          </div>
-          <button
-            onClick={() => onAdd(dish)}
-            aria-label={`Add ${dish.name} to order`}
-            className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-lg font-light transition-all duration-150 ${
-              added
-                ? "bg-accent-new border-accent-new text-white"
-                : "border-beige-dark text-burgundy hover:bg-burgundy hover:text-white hover:border-burgundy"
-            }`}
-          >
-            {added ? "✓" : "+"}
-          </button>
+        <h3 className="mt-1 text-[15px] font-semibold leading-snug text-text-primary">{name}</h3>
+        <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-text-secondary">{dish.description[lang]}</p>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="text-sm font-bold text-burgundy">{money(dish.price)}</span>
+          {dish.soldOut ? (
+            <span className="text-xs font-semibold text-text-muted">{t("soldOut")}</span>
+          ) : qty === 0 ? (
+            <button
+              onClick={() => onQty(dish.id, 1)}
+              aria-label={`${t("add")} ${name}`}
+              className="min-h-11 rounded-full border-2 border-burgundy px-5 text-sm font-semibold text-burgundy transition hover:bg-burgundy hover:text-white active:scale-95"
+            >
+              + {t("add")}
+            </button>
+          ) : (
+            <div className="flex items-center gap-1 rounded-full bg-burgundy text-white">
+              <button onClick={() => onQty(dish.id, qty - 1)} aria-label={`${t("decrease")} ${name}`} className="h-11 w-11 text-xl">−</button>
+              <span className="min-w-5 text-center text-sm font-bold" aria-live="polite">{qty}</span>
+              <button onClick={() => onQty(dish.id, qty + 1)} aria-label={`${t("increase")} ${name}`} className="h-11 w-11 text-xl">+</button>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
+
+export default memo(DishCard);
