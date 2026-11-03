@@ -8,8 +8,8 @@ export const restaurant = {
   name: { ar: "فلوريا", en: "Florya" },
   type: { ar: "مطعم", en: "Restaurant" },
   tagline: {
-    ar: "تجربة طعام لا تُنسى",
-    en: "An unforgettable dining experience",
+    ar: "أكل على نار هادئة، وسفرة تجمع أهلك وأحبابك",
+    en: "Food cooked slowly, and a table made for sharing",
   },
   /** رقم الواتساب بصيغة دولية بدون + أو أصفار (مثال: 966501234567) */
   whatsapp: "966501234567",
@@ -19,7 +19,7 @@ export const restaurant = {
     ar: "طريق الملك فهد، الرياض، المملكة العربية السعودية",
     en: "King Fahd Road, Riyadh, Saudi Arabia",
   },
-  hours: { ar: "يوميًا من 12 ظهرًا حتى 12 منتصف الليل", en: "Daily 12 PM – 12 AM" },
+  hours: { ar: "كل يوم من 12 الظهر لين 12 الليل", en: "Every day, noon to midnight" },
   mapsUrl: "https://maps.google.com/?q=Riyadh",
   currency: { ar: "ر.س", en: "SAR" },
   /** اللغة الافتراضية عند أول زيارة */
@@ -27,5 +27,7 @@ export const restaurant = {
   /** العنوان الأساسي للموقع بعد النشر — يُستخدم في صفحة طباعة QR للطاولات */
   siteUrl: "",
   /** لون العلامة التجارية — غيّره أيضًا في globals.css (--color-burgundy) */
+  /** صورة غلاف اختيارية (رابط أو ملف داخل public/). اتركها فارغة لاستخدام رسمة الواجهة الجاهزة. */
+  coverImage: "",
   themeColor: "#722F37",
 };

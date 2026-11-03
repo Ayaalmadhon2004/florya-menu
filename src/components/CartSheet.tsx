@@ -28,9 +28,9 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
   const send = () => {
     if (!lines.length) return;
     const head = tableParam || type === "dine"
-      ? `${t("dineIn")}${table ? ` — ${t("table")} ${table}` : ""}`
+      ? `${t("dineIn")}${table ? ` / ${t("table")} ${table}` : ""}`
       : t("takeaway");
-    const body = lines.map((l) => `• ${l.qty}× ${l.dish.name[lang]} — ${money(l.qty * l.dish.price)}`);
+    const body = lines.map((l) => `• ${l.qty}× ${l.dish.name[lang]}: ${money(l.qty * l.dish.price)}`);
     const msg = [
       `${t("hello")} (${restaurant.name[lang]})`,
       head,
