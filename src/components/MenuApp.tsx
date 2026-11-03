@@ -9,6 +9,7 @@ import { categories, allDishes } from "../data/menu";
 import { ui, type Lang, type UiKey } from "../lib/i18n";
 import DishCard from "./DishCard";
 import CartSheet from "./CartSheet";
+import Facade from "./Facade";
 import Ornament from "./Ornament";
 
 const QRModal = dynamic(() => import("./QRModal"), { ssr: false });
@@ -26,7 +27,6 @@ export default function MenuApp() {
   const [lang, setLang] = useState<Lang>(restaurant.defaultLang);
   const [cart, setCart] = useState<Cart>({});
   const [page, setPage] = useState(0);
-  const [coverOk, setCoverOk] = useState(true);
   const [showCart, setShowCart] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
@@ -163,40 +163,30 @@ export default function MenuApp() {
               <div aria-hidden className={`pointer-events-none absolute inset-y-0 z-10 w-5 ${rtl ? "right-0 bg-gradient-to-l" : "left-0 bg-gradient-to-r"} from-black/15 to-transparent`} />
               <div className="no-scrollbar h-full overflow-y-auto">
                 {page === 0 && (
-                  <div className="relative flex min-h-full flex-col overflow-hidden bg-burgundy-dark text-white">
-                    {restaurant.coverImage && coverOk && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={restaurant.coverImage}
-                        alt=""
-                        onError={() => setCoverOk(false)}
-                        className="absolute inset-0 h-full w-full object-cover opacity-60"
-                      />
-                    )}
-                    <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-burgundy-dark/65 via-burgundy/40 to-burgundy-dark/85" />
-                    <div aria-hidden className="absolute inset-3 rounded-md border border-gold/50" />
+                  <div className="relative flex min-h-full flex-col overflow-hidden bg-[#1B0B0E] text-white">
+                    <div className="relative h-[52%] min-h-[260px] shrink-0">
+                      {restaurant.coverImage ? (
+                        <img src={restaurant.coverImage} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <Facade />
+                      )}
+                      <div aria-hidden className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#1B0B0E] to-transparent" />
+                    </div>
                     <motion.div
                       initial="hidden"
                       animate="show"
                       variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } } }}
-                      className="relative flex flex-1 flex-col items-center justify-center px-10 py-16 text-center"
+                      className="relative flex flex-1 flex-col items-center px-8 pb-8 text-center"
                     >
-                      <motion.div
-                        variants={{ hidden: { scale: 0.6, opacity: 0 }, show: { scale: 1, opacity: 1 } }}
-                        transition={{ type: "spring", stiffness: 180, damping: 16 }}
-                        className="mb-5 grid h-24 w-24 place-items-center rounded-full border-2 border-gold bg-black/20 font-display text-5xl font-bold text-gold-light backdrop-blur-sm"
-                      >
-                        {restaurant.name[lang].charAt(0)}
-                      </motion.div>
-                      <motion.h1 variants={rise} className="font-display text-5xl font-bold text-gold-light drop-shadow">{restaurant.name[lang]}</motion.h1>
-                      <motion.p variants={rise} className="mt-3 text-xs uppercase tracking-[0.35em] text-white/90 drop-shadow">{restaurant.type[lang]}</motion.p>
-                      <motion.div variants={rise} className="w-full"><Ornament className="my-4" /></motion.div>
-                      <motion.p variants={rise} className="max-w-xs text-[15px] leading-relaxed text-white drop-shadow">{restaurant.tagline[lang]}</motion.p>
+                      <motion.p variants={rise} className="text-xs uppercase tracking-[0.35em] text-gold-light">{restaurant.type[lang]}</motion.p>
+                      <motion.h1 variants={rise} className="mt-2 font-display text-5xl font-bold text-gold-light">{restaurant.name[lang]}</motion.h1>
+                      <motion.div variants={rise} className="w-full"><Ornament className="my-3" /></motion.div>
+                      <motion.p variants={rise} className="max-w-xs text-[15px] leading-relaxed text-white/85">{restaurant.tagline[lang]}</motion.p>
                       <motion.button
                         variants={rise}
                         whileTap={{ scale: 0.96 }}
                         onClick={() => goTo(1)}
-                        className="mt-10 min-h-12 rounded-full border border-gold bg-black/25 px-9 font-semibold tracking-wide text-gold-light backdrop-blur-sm transition hover:bg-gold/30"
+                        className="mt-auto min-h-12 rounded-full border border-gold bg-gold/15 px-9 pt-0 font-semibold tracking-wide text-gold-light transition hover:bg-gold/30"
                       >
                         {t("explore")}
                       </motion.button>
