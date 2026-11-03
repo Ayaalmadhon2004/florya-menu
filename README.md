@@ -1,23 +1,25 @@
-# Florya Digital Menu
+# Florya — قائمة طعام رقمية (QR Menu)
 
-A premium digital menu experience for Florya Restaurant, built with Next.js, React, and Tailwind CSS.
+قائمة رقمية احترافية للمطاعم والكافيهات: الزبون يمسح QR على الطاولة، يتصفح القائمة، ويرسل طلبه عبر واتساب.
 
-## Features
+## المميزات
+- عربي / English مع RTL كامل وتبديل لغة فوري
+- طلب عبر واتساب برقم الطاولة (أو سفري) مع كميات وملاحظات
+- بحث + تبويبات أقسام ثابتة
+- صفحة طباعة أكواد QR لكل الطاولات: `/qr?tables=20`
+- تعمل كتطبيق على الجوال (PWA manifest)، سريعة، موقع ثابت (استضافة مجانية)
 
-- **Flipbook Navigation** — Smooth page transitions with 3D flip animation
-- **Table-Specific Ordering** — Each table has its own QR code; orders include table number
-- **WhatsApp Integration** — One-click order submission via WhatsApp
-- **Mobile-First Design** — Optimized for phones and tablets
-- **QR Code Sharing** — Customers can share the menu instantly
+## التسليم لعميل جديد (10 دقائق)
+1. `src/config/restaurant.ts` — الاسم، رقم واتساب، العنوان، الساعات، العملة.
+2. `src/data/menu.ts` — الأقسام والأصناف والأسعار والصور.
+3. `src/app/globals.css` — لون العلامة (`--color-burgundy`).
+4. `npm run build` ثم ارفع مجلد `out/` على Netlify / Vercel / Cloudflare Pages.
 
-## Tech Stack
-
-- Next.js 16 + React 19 + TypeScript
-- Tailwind CSS v4
-- Framer Motion
-
-## Getting Started
-
+## التشغيل
 ```bash
 npm install
 npm run dev
+```
+
+## التقنيات
+Next.js 16 · React 19 · TypeScript · Tailwind CSS v4
