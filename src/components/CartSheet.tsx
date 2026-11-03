@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { restaurant } from "../config/restaurant";
 import type { Dish } from "../data/menu";
 import type { Lang, UiKey } from "../lib/i18n";
@@ -43,8 +44,24 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={onClose} role="dialog" aria-modal="true" aria-label={t("yourOrder")}>
-      <div className="flex max-h-[90vh] w-full max-w-lg animate-slideUp flex-col rounded-t-3xl bg-beige" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      initial={{ backgroundColor: "rgba(0,0,0,0)" }}
+      animate={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      exit={{ backgroundColor: "rgba(0,0,0,0)" }}
+      className="fixed inset-0 z-50 flex items-end justify-center"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("yourOrder")}
+    >
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 32 }}
+        className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-t-3xl bg-beige"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between px-5 pb-2 pt-5">
           <h2 className="text-lg font-bold text-burgundy">{t("yourOrder")}</h2>
           <div className="flex items-center gap-3">
@@ -54,8 +71,9 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto px-5 pb-3">
+          <AnimatePresence initial={false}>
           {lines.map(({ dish, qty }) => (
-            <div key={dish.id} className="flex items-center gap-3 rounded-xl bg-white p-2.5">
+            <motion.div layout key={dish.id} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30, height: 0 }} className="flex items-center gap-3 rounded-xl bg-white p-2.5">
               <img src={dish.image} alt="" width={56} height={56} className="h-14 w-14 rounded-lg object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{dish.name[lang]}</p>
@@ -66,8 +84,9 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
                 <span className="min-w-5 text-center text-sm font-bold">{qty}</span>
                 <button onClick={() => onQty(dish.id, qty + 1)} aria-label={t("increase")} className="h-11 w-10 text-lg">+</button>
               </div>
-            </div>
+            </motion.div>
           ))}
+          </AnimatePresence>
 
           {!tableParam && (
             <div>
@@ -112,11 +131,11 @@ export default function CartSheet({ lang, lines, total, tableParam, money, t, on
             <span className="text-sm text-text-secondary">{t("total")}</span>
             <span className="text-xl font-bold text-burgundy">{money(total)}</span>
           </div>
-          <button onClick={send} className="min-h-12 w-full rounded-xl bg-[#25D366] text-base font-bold text-white active:scale-[.99]">
+          <motion.button whileTap={{ scale: 0.97 }} onClick={send} className="min-h-12 w-full rounded-xl bg-[#25D366] text-base font-bold text-white">
             {t("sendWhatsApp")}
-          </button>
+          </motion.button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

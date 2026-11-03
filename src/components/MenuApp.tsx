@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { restaurant } from "../config/restaurant";
 import { categories, allDishes } from "../data/menu";
 import { ui, type Lang, type UiKey } from "../lib/i18n";
@@ -12,6 +13,8 @@ import CartSheet from "./CartSheet";
 const QRModal = dynamic(() => import("./QRModal"), { ssr: false });
 
 export type Cart = Record<string, number>;
+
+const rise = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
 
 export default function MenuApp() {
   const params = useSearchParams();
@@ -113,11 +116,12 @@ export default function MenuApp() {
   const pageUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="mx-auto min-h-screen max-w-lg bg-beige shadow-2xl pb-28">
       {/* hero */}
       <header className="relative overflow-hidden bg-burgundy text-white">
-        <div aria-hidden className="pointer-events-none absolute -top-16 -end-16 h-56 w-56 rounded-full bg-white/5" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-24 -start-10 h-64 w-64 rounded-full bg-white/5" />
+        <motion.div aria-hidden animate={{ scale: [1, 1.12, 1], x: [0, -10, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none absolute -top-16 -end-16 h-56 w-56 rounded-full bg-white/5" />
+        <motion.div aria-hidden animate={{ scale: [1.1, 1, 1.1], y: [0, -12, 0] }} transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none absolute -bottom-24 -start-10 h-64 w-64 rounded-full bg-white/5" />
         <div className="relative flex items-center justify-between px-4 pt-4">
           <button
             onClick={() => setLang(lang === "ar" ? "en" : "ar")}
@@ -134,19 +138,28 @@ export default function MenuApp() {
             ⤴
           </button>
         </div>
-        <div className="relative px-6 pb-8 pt-4 text-center">
-          <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-full border-2 border-white/40 bg-white/10 text-4xl font-bold">
+        <motion.div
+          className="relative px-6 pb-8 pt-4 text-center"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.12 } } }}
+        >
+          <motion.div
+            variants={{ hidden: { scale: 0.5, opacity: 0, rotate: -20 }, show: { scale: 1, opacity: 1, rotate: 0 } }}
+            transition={{ type: "spring", stiffness: 180, damping: 14 }}
+            className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-full border-2 border-white/40 bg-white/10 text-4xl font-bold"
+          >
             {restaurant.name[lang].charAt(0)}
-          </div>
-          <h1 className="text-3xl font-bold tracking-wide">{restaurant.name[lang]}</h1>
-          <p className="mt-1 text-sm uppercase tracking-[0.25em] text-white/80">{restaurant.type[lang]}</p>
-          <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/85">{restaurant.tagline[lang]}</p>
+          </motion.div>
+          <motion.h1 variants={rise} className="text-3xl font-bold tracking-wide">{restaurant.name[lang]}</motion.h1>
+          <motion.p variants={rise} className="mt-1 text-sm uppercase tracking-[0.25em] text-white/80">{restaurant.type[lang]}</motion.p>
+          <motion.p variants={rise} className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/85">{restaurant.tagline[lang]}</motion.p>
           {tableParam && (
             <p className="mt-4 inline-block rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-burgundy" role="status">
               {t("table")} {tableParam}
             </p>
           )}
-        </div>
+        </motion.div>
       </header>
 
       {/* sticky search + categories */}
@@ -184,7 +197,7 @@ export default function MenuApp() {
         {visible.length === 0 && <p className="py-16 text-center text-text-secondary">{t("noResults")}</p>}
         {visible.map((c) => (
           <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-32 pt-5">
-            <h2 className="text-xl font-bold text-burgundy">{c.title[lang]}</h2>
+            <motion.h2 initial={{ opacity: 0, x: lang === "ar" ? 24 : -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.4 }} className="text-xl font-bold text-burgundy">{c.title[lang]}</motion.h2>
             <p className="mb-3 text-sm text-text-secondary">{c.subtitle[lang]}</p>
             <div className="space-y-3">
               {c.dishes.map((d) => (
@@ -215,21 +228,32 @@ export default function MenuApp() {
       </main>
 
       {/* floating cart bar */}
+      <AnimatePresence>
       {count > 0 && !showCart && (
-        <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-lg p-3">
-          <button
+        <motion.div
+          key="bar"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 24 }}
+          className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-lg p-3"
+        >
+          <motion.button
+            whileTap={{ scale: 0.97 }}
             onClick={() => setShowCart(true)}
-            className="flex min-h-14 w-full animate-slideUp items-center justify-between rounded-2xl bg-burgundy px-5 text-white shadow-xl"
+            className="flex min-h-14 w-full items-center justify-between rounded-2xl bg-burgundy px-5 text-white shadow-xl"
           >
             <span className="flex items-center gap-3">
-              <span className="grid h-8 min-w-8 place-items-center rounded-full bg-white px-2 text-sm font-bold text-burgundy">{count}</span>
+              <motion.span key={count} initial={{ scale: 1.5 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }} className="grid h-8 min-w-8 place-items-center rounded-full bg-white px-2 text-sm font-bold text-burgundy">{count}</motion.span>
               <span className="font-semibold">{t("viewOrder")}</span>
             </span>
             <span className="font-bold">{money(total)}</span>
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
+      </AnimatePresence>
 
+      <AnimatePresence>
       {showCart && (
         <CartSheet
           lang={lang}
@@ -243,7 +267,11 @@ export default function MenuApp() {
           onClose={() => setShowCart(false)}
         />
       )}
+      </AnimatePresence>
+      <AnimatePresence>
       {showQR && <QRModal url={pageUrl} t={t} onClose={() => setShowQR(false)} />}
+      </AnimatePresence>
     </div>
+    </MotionConfig>
   );
 }
