@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { restaurant } from "../config/restaurant";
 import { categories, allDishes } from "../data/menu";
 import { ui, type Lang, type UiKey } from "../lib/i18n";
@@ -13,17 +14,18 @@ const QRModal = dynamic(() => import("./QRModal"), { ssr: false });
 
 export type Cart = Record<string, number>;
 
+export const rise = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
+
 export default function MenuApp() {
   const params = useSearchParams();
   const tableParam = params.get("table");
 
   const [lang, setLang] = useState<Lang>(restaurant.defaultLang);
   const [cart, setCart] = useState<Cart>({});
-  const [query, setQuery] = useState("");
-  const [active, setActive] = useState(categories[0].id);
+  const [page, setPage] = useState(0);
+  const [dir, setDir] = useState(1);
   const [showCart, setShowCart] = useState(false);
   const [showQR, setShowQR] = useState(false);
-  const chipsRef = useRef<HTMLDivElement>(null);
 
   const t = useCallback((k: UiKey) => ui[k][lang], [lang]);
   const money = useCallback(
@@ -67,183 +69,205 @@ export default function MenuApp() {
   const count = cartLines.reduce((s, l) => s + l.qty, 0);
   const total = cartLines.reduce((s, l) => s + l.qty * l.dish.price, 0);
 
-  // search
-  const q = query.trim().toLowerCase();
-  const visible = useMemo(
-    () =>
-      categories
-        .map((c) => ({
-          ...c,
-          dishes: q
-            ? c.dishes.filter((d) =>
-                `${d.name.ar} ${d.name.en} ${d.description.ar} ${d.description.en}`.toLowerCase().includes(q)
-              )
-            : c.dishes,
-        }))
-        .filter((c) => c.dishes.length > 0),
-    [q]
+  // pages: cover, index, one per category, contact
+  const total_pages = categories.length + 3;
+  const lastPage = total_pages - 1;
+  const goTo = useCallback(
+    (n: number) => {
+      if (n < 0 || n > lastPage || n === page) return;
+      setDir(n > page ? 1 : -1);
+      setPage(n);
+    },
+    [page, lastPage]
   );
+  const next = useCallback(() => goTo(page + 1), [goTo, page]);
+  const prev = useCallback(() => goTo(page - 1), [goTo, page]);
 
-  // highlight the category being read
+  // keyboard + swipe (direction follows the book: RTL books turn the other way)
+  const rtl = lang === "ar";
   useEffect(() => {
-    const els = categories.map((c) => document.getElementById(`cat-${c.id}`)).filter(Boolean) as HTMLElement[];
-    if (!els.length || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (hit) setActive(hit.target.id.replace("cat-", ""));
-      },
-      { rootMargin: "-120px 0px -65% 0px" }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [visible]);
+    const onKey = (e: KeyboardEvent) => {
+      if (showCart || showQR) return;
+      if (e.key === "ArrowRight") (rtl ? prev : next)();
+      if (e.key === "ArrowLeft") (rtl ? next : prev)();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [next, prev, rtl, showCart, showQR]);
+  const [touchX, setTouchX] = useState<number | null>(null);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchX === null) return;
+    const diff = e.changedTouches[0].clientX - touchX;
+    setTouchX(null);
+    if (Math.abs(diff) < 60) return;
+    // swiping toward the spine side goes back; away from it goes forward
+    const forward = rtl ? diff > 0 : diff < 0;
+    (forward ? next : prev)();
+  };
 
-  // keep the active chip in view
-  useEffect(() => {
-    const chip = chipsRef.current?.querySelector<HTMLElement>(`[data-chip="${active}"]`);
-    chip?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
-  }, [active]);
-
-  const jump = (id: string) => {
-    setActive(id);
-    document.getElementById(`cat-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // flip animation: the old page turns over the spine while the new one waits underneath
+  const sign = rtl ? 1 : -1;
+  const origin = rtl ? "right center" : "left center";
+  const flip = {
+    enter: (d: number) => (d > 0 ? { rotateY: 0, zIndex: 0 } : { rotateY: -sign * 100, zIndex: 2 }),
+    center: { rotateY: 0, zIndex: 1, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } },
+    exit: (d: number) =>
+      d > 0
+        ? { rotateY: sign * 100, zIndex: 2, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] as const } }
+        : { zIndex: 0, transition: { duration: 0.7 } },
   };
 
   const pageUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
+  const pageNo = (n: number) => `${(n + 1).toLocaleString(rtl ? "ar-EG" : "en-US")} / ${total_pages.toLocaleString(rtl ? "ar-EG" : "en-US")}`;
+
+  const category = page >= 2 && page <= lastPage - 1 ? categories[page - 2] : null;
+
+  const pageHeader = (title: string, subtitle?: string) => (
+    <div className="relative overflow-hidden bg-burgundy px-6 pb-5 pt-5 text-center text-white">
+      <div aria-hidden className="absolute -top-12 -end-12 h-40 w-40 rounded-full bg-white/5" />
+      <p className="text-xs tracking-widest text-white/70">{pageNo(page)}</p>
+      <h2 className="mt-1 text-2xl font-bold">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-sm text-white/80">{subtitle}</p>}
+    </div>
+  );
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg bg-beige shadow-2xl pb-28">
-      {/* hero */}
-      <header className="relative overflow-hidden bg-burgundy text-white">
-        <div aria-hidden className="pointer-events-none absolute -top-16 -end-16 h-56 w-56 rounded-full bg-white/5" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-24 -start-10 h-64 w-64 rounded-full bg-white/5" />
-        <div className="relative flex items-center justify-between px-4 pt-4">
-          <button
-            onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-            className="min-h-11 rounded-full border border-white/30 bg-white/10 px-4 text-sm font-semibold backdrop-blur hover:bg-white/20"
-            aria-label="Switch language"
-          >
+    <MotionConfig reducedMotion="user">
+      <div className="mx-auto flex h-dvh max-w-lg flex-col overflow-hidden bg-[#EADFD2] shadow-2xl">
+        {/* top bar */}
+        <div className="flex items-center justify-between bg-burgundy-dark px-4 py-2 text-white">
+          <button onClick={() => setLang(rtl ? "en" : "ar")} className="min-h-11 rounded-full border border-white/30 bg-white/10 px-4 text-sm font-semibold hover:bg-white/20" aria-label="Switch language">
             {t("lang")}
           </button>
-          <button
-            onClick={() => setShowQR(true)}
-            className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg backdrop-blur hover:bg-white/20"
-            aria-label={t("share")}
-          >
-            ⤴
-          </button>
+          <span className="text-sm font-semibold tracking-wide">
+            {restaurant.name[lang]}
+            {tableParam && <span className="ms-2 rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-burgundy">{t("table")} {tableParam}</span>}
+          </span>
+          <button onClick={() => setShowQR(true)} className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-lg hover:bg-white/20" aria-label={t("share")}>⤴</button>
         </div>
-        <div className="relative px-6 pb-8 pt-4 text-center">
-          <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-full border-2 border-white/40 bg-white/10 text-4xl font-bold">
-            {restaurant.name[lang].charAt(0)}
-          </div>
-          <h1 className="text-3xl font-bold tracking-wide">{restaurant.name[lang]}</h1>
-          <p className="mt-1 text-sm uppercase tracking-[0.25em] text-white/80">{restaurant.type[lang]}</p>
-          <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/85">{restaurant.tagline[lang]}</p>
-          {tableParam && (
-            <p className="mt-4 inline-block rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-burgundy" role="status">
-              {t("table")} {tableParam}
-            </p>
-          )}
-        </div>
-      </header>
 
-      {/* sticky search + categories */}
-      <div className="sticky top-0 z-30 border-b border-beige-dark bg-beige/95 backdrop-blur">
-        <div className="px-4 pt-3">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("search")}
-            aria-label={t("search")}
-            className="h-11 w-full rounded-full border border-beige-dark bg-white px-5 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-burgundy"
-          />
-        </div>
-        <div ref={chipsRef} className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3" role="tablist">
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              data-chip={c.id}
-              role="tab"
-              aria-selected={active === c.id}
-              onClick={() => jump(c.id)}
-              className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-medium transition ${
-                active === c.id ? "bg-burgundy text-white" : "border border-beige-dark bg-white text-text-primary"
-              }`}
+        {/* the book */}
+        <div className="relative flex-1 overflow-hidden p-2" style={{ perspective: 1600 }} onTouchStart={(e) => setTouchX(e.touches[0].clientX)} onTouchEnd={onTouchEnd}>
+          <AnimatePresence initial={false} custom={dir}>
+            <motion.div
+              key={page}
+              custom={dir}
+              variants={flip}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              style={{ transformOrigin: origin, backfaceVisibility: "hidden" }}
+              className="absolute inset-2 overflow-hidden rounded-lg bg-beige shadow-[0_6px_24px_rgba(60,30,20,.35)]"
             >
-              {c.title[lang]}
-            </button>
-          ))}
+              {/* spine shadow */}
+              <div aria-hidden className={`pointer-events-none absolute inset-y-0 z-10 w-5 ${rtl ? "right-0 bg-gradient-to-l" : "left-0 bg-gradient-to-r"} from-black/15 to-transparent`} />
+              <div className="no-scrollbar h-full overflow-y-auto">
+                {page === 0 && (
+                  <div className="flex min-h-full flex-col">
+                    <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.35 } } }} className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-burgundy px-6 py-16 text-center text-white">
+                      <motion.div aria-hidden animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 9, repeat: Infinity }} className="absolute -top-16 -end-16 h-56 w-56 rounded-full bg-white/5" />
+                      <motion.div aria-hidden animate={{ scale: [1.1, 1, 1.1] }} transition={{ duration: 11, repeat: Infinity }} className="absolute -bottom-24 -start-10 h-64 w-64 rounded-full bg-white/5" />
+                      <motion.div variants={{ hidden: { scale: 0.5, opacity: 0, rotate: -20 }, show: { scale: 1, opacity: 1, rotate: 0 } }} transition={{ type: "spring", stiffness: 180, damping: 14 }} className="relative mb-5 grid h-24 w-24 place-items-center rounded-full border-2 border-white/40 bg-white/10 text-5xl font-bold">
+                        {restaurant.name[lang].charAt(0)}
+                      </motion.div>
+                      <motion.h1 variants={rise} className="relative text-4xl font-bold tracking-wide">{restaurant.name[lang]}</motion.h1>
+                      <motion.p variants={rise} className="relative mt-1 text-sm uppercase tracking-[0.3em] text-white/80">{restaurant.type[lang]}</motion.p>
+                      <motion.p variants={rise} className="relative mt-4 max-w-xs text-sm leading-relaxed text-white/85">{restaurant.tagline[lang]}</motion.p>
+                    </motion.div>
+                    <div className="px-8 py-8 text-center">
+                      <motion.button whileTap={{ scale: 0.96 }} onClick={() => goTo(1)} className="min-h-12 rounded-xl bg-burgundy px-8 font-semibold text-white shadow-md">
+                        {t("explore")} {rtl ? "←" : "→"}
+                      </motion.button>
+                    </div>
+                  </div>
+                )}
+
+                {page === 1 && (
+                  <div className="min-h-full">
+                    {pageHeader(t("menu"), restaurant.tagline[lang])}
+                    <nav className="px-5 py-4" aria-label={t("menu")}>
+                      {categories.map((c, i) => (
+                        <button key={c.id} onClick={() => goTo(i + 2)} className="flex min-h-14 w-full items-center gap-3 border-b border-beige-dark px-1 text-start transition hover:bg-white/60">
+                          <span className="grid h-9 w-9 place-items-center rounded-full bg-burgundy/10 text-sm font-bold text-burgundy">{(i + 1).toLocaleString(rtl ? "ar-EG" : "en-US")}</span>
+                          <span className="flex-1">
+                            <span className="block text-[15px] font-semibold">{c.title[lang]}</span>
+                            <span className="block text-xs text-text-secondary">{c.subtitle[lang]}</span>
+                          </span>
+                          <span className="text-text-muted">{rtl ? "‹" : "›"}</span>
+                        </button>
+                      ))}
+                    </nav>
+                  </div>
+                )}
+
+                {category && (
+                  <div className="min-h-full pb-4">
+                    {pageHeader(category.title[lang], category.subtitle[lang])}
+                    <div className="space-y-3 px-3 pt-3">
+                      {category.dishes.map((d) => (
+                        <DishCard key={d.id} dish={d} lang={lang} qty={cart[d.id] ?? 0} onQty={setQty} money={money} t={t} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {page === lastPage && (
+                  <div className="min-h-full">
+                    {pageHeader(t("contact"))}
+                    <div className="space-y-4 p-6 text-center">
+                      <p className="text-sm text-text-secondary">{restaurant.address[lang]}</p>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">{t("hours")}</p>
+                        <p className="text-sm">{restaurant.hours[lang]}</p>
+                      </div>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">📞 {t("call")}</a>
+                        <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">📍 {t("directions")}</a>
+                        <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">@{restaurant.instagram}</a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
-      </div>
 
-      {/* menu */}
-      <main className="px-4 pt-2">
-        {visible.length === 0 && <p className="py-16 text-center text-text-secondary">{t("noResults")}</p>}
-        {visible.map((c) => (
-          <section key={c.id} id={`cat-${c.id}`} className="scroll-mt-32 pt-5">
-            <h2 className="text-xl font-bold text-burgundy">{c.title[lang]}</h2>
-            <p className="mb-3 text-sm text-text-secondary">{c.subtitle[lang]}</p>
-            <div className="space-y-3">
-              {c.dishes.map((d) => (
-                <DishCard key={d.id} dish={d} lang={lang} qty={cart[d.id] ?? 0} onQty={setQty} money={money} t={t} />
-              ))}
-            </div>
-          </section>
-        ))}
+        {/* cart bar */}
+        <AnimatePresence>
+          {count > 0 && (
+            <motion.div key="bar" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden px-3">
+              <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowCart(true)} className="mb-2 flex min-h-14 w-full items-center justify-between rounded-2xl bg-burgundy px-5 text-white shadow-xl">
+                <span className="flex items-center gap-3">
+                  <motion.span key={count} initial={{ scale: 1.5 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15 }} className="grid h-8 min-w-8 place-items-center rounded-full bg-white px-2 text-sm font-bold text-burgundy">{count}</motion.span>
+                  <span className="font-semibold">{t("viewOrder")}</span>
+                </span>
+                <span className="font-bold">{money(total)}</span>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* contact */}
-        <footer className="mt-10 rounded-2xl bg-white p-5 text-center shadow-sm">
-          <h2 className="mb-3 text-lg font-bold text-burgundy">{t("contact")}</h2>
-          <p className="text-sm text-text-secondary">{restaurant.address[lang]}</p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-text-muted">{t("hours")}</p>
-          <p className="text-sm text-text-primary">{restaurant.hours[lang]}</p>
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <a href={`tel:${restaurant.phone.replace(/\s/g, "")}`} className="min-h-11 rounded-full bg-burgundy px-5 py-2.5 text-sm font-semibold text-white">
-              📞 {t("call")}
-            </a>
-            <a href={restaurant.mapsUrl} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">
-              📍 {t("directions")}
-            </a>
-            <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer" className="min-h-11 rounded-full border border-burgundy px-5 py-2.5 text-sm font-semibold text-burgundy">
-              @{restaurant.instagram}
-            </a>
+        {/* page controls */}
+        <nav className="flex items-center justify-between bg-white px-4 py-2" aria-label="Pages">
+          <button onClick={prev} disabled={page === 0} aria-label="Previous page" className="grid h-12 w-12 place-items-center rounded-full border border-beige-dark text-xl text-burgundy disabled:opacity-30">{rtl ? "→" : "←"}</button>
+          <div className="flex items-center gap-1.5" role="tablist">
+            {Array.from({ length: total_pages }, (_, i) => (
+              <button key={i} role="tab" aria-selected={i === page} aria-label={`${i + 1}`} onClick={() => goTo(i)} className="grid h-6 place-items-center px-0.5">
+                <span className={`block h-2 rounded-full transition-all ${i === page ? "w-5 bg-burgundy" : "w-2 bg-beige-dark"}`} />
+              </button>
+            ))}
           </div>
-        </footer>
-      </main>
+          <button onClick={next} disabled={page === lastPage} aria-label="Next page" className="grid h-12 w-12 place-items-center rounded-full border border-beige-dark text-xl text-burgundy disabled:opacity-30">{rtl ? "←" : "→"}</button>
+        </nav>
 
-      {/* floating cart bar */}
-      {count > 0 && !showCart && (
-        <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-lg p-3">
-          <button
-            onClick={() => setShowCart(true)}
-            className="flex min-h-14 w-full animate-slideUp items-center justify-between rounded-2xl bg-burgundy px-5 text-white shadow-xl"
-          >
-            <span className="flex items-center gap-3">
-              <span className="grid h-8 min-w-8 place-items-center rounded-full bg-white px-2 text-sm font-bold text-burgundy">{count}</span>
-              <span className="font-semibold">{t("viewOrder")}</span>
-            </span>
-            <span className="font-bold">{money(total)}</span>
-          </button>
-        </div>
-      )}
-
-      {showCart && (
-        <CartSheet
-          lang={lang}
-          lines={cartLines}
-          total={total}
-          tableParam={tableParam}
-          money={money}
-          t={t}
-          onQty={setQty}
-          onClear={() => setCart({})}
-          onClose={() => setShowCart(false)}
-        />
-      )}
-      {showQR && <QRModal url={pageUrl} t={t} onClose={() => setShowQR(false)} />}
-    </div>
+        <AnimatePresence>
+          {showCart && (
+            <CartSheet lang={lang} lines={cartLines} total={total} tableParam={tableParam} money={money} t={t} onQty={setQty} onClear={() => setCart({})} onClose={() => setShowCart(false)} />
+          )}
+        </AnimatePresence>
+        <AnimatePresence>{showQR && <QRModal url={pageUrl} t={t} onClose={() => setShowQR(false)} />}</AnimatePresence>
+      </div>
+    </MotionConfig>
   );
 }

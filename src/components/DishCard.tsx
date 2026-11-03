@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import { motion } from "framer-motion";
 import type { Dish, Badge } from "../data/menu";
 import type { Lang, UiKey } from "../lib/i18n";
 
@@ -24,8 +25,17 @@ const badgeKey: Record<Badge, UiKey> = { hot: "bestseller", new: "new", veg: "ve
 function DishCard({ dish, lang, qty, onQty, money, t }: Props) {
   const name = dish.name[lang];
   return (
-    <article className={`flex gap-3 rounded-2xl bg-white p-3 shadow-sm ${dish.soldOut ? "opacity-60" : ""}`}>
-      <img
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      whileHover={{ y: -2 }}
+      className={`flex gap-3 rounded-2xl bg-white p-3 shadow-sm ${dish.soldOut ? "opacity-60" : ""}`}
+    >
+      <motion.img
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.3 }}
         src={dish.image}
         alt={name}
         width={104}
@@ -49,23 +59,24 @@ function DishCard({ dish, lang, qty, onQty, money, t }: Props) {
           {dish.soldOut ? (
             <span className="text-xs font-semibold text-text-muted">{t("soldOut")}</span>
           ) : qty === 0 ? (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={() => onQty(dish.id, 1)}
               aria-label={`${t("add")} ${name}`}
               className="min-h-11 rounded-full border-2 border-burgundy px-5 text-sm font-semibold text-burgundy transition hover:bg-burgundy hover:text-white active:scale-95"
             >
               + {t("add")}
-            </button>
+            </motion.button>
           ) : (
-            <div className="flex items-center gap-1 rounded-full bg-burgundy text-white">
+            <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} className="flex items-center gap-1 rounded-full bg-burgundy text-white">
               <button onClick={() => onQty(dish.id, qty - 1)} aria-label={`${t("decrease")} ${name}`} className="h-11 w-11 text-xl">−</button>
-              <span className="min-w-5 text-center text-sm font-bold" aria-live="polite">{qty}</span>
+              <motion.span key={qty} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="min-w-5 text-center text-sm font-bold" aria-live="polite">{qty}</motion.span>
               <button onClick={() => onQty(dish.id, qty + 1)} aria-label={`${t("increase")} ${name}`} className="h-11 w-11 text-xl">+</button>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
